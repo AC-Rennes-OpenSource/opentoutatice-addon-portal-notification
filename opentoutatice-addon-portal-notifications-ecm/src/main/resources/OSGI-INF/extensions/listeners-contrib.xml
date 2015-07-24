@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<component name="org.osivia.platform.portal.notifications.listener">
+
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+		point="listener">
+
+		<listener name="notificationListener" async="true"
+			postCommit="true"
+			class="org.osivia.platform.portal.notifications.listener.NotificationsEventListener"
+			priority="120">
+		</listener>
+
+	</extension>
+
+</component>
+
+

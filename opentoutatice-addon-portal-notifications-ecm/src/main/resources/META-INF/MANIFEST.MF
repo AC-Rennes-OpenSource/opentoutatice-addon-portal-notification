@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 1
+Bundle-Name: OpenToutatice custom notifications 
+Bundle-SymbolicName: org.osivia.platform.portal.notifications;singleton:=true
+Bundle-Localization: plugin
+Bundle-Category: stateful
+Nuxeo-Component: OSGI-INF/extensions/listeners-contrib.xml,
+ OSGI-INF/extensions/veto-contrib.xml
+ 
+ 
