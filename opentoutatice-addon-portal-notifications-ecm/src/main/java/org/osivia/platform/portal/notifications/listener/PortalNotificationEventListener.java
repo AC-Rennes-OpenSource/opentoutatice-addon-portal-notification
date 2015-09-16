@@ -31,7 +31,7 @@ import org.nuxeo.ecm.platform.notification.api.Notification;
  * @author David Chevrier.
  *
  */
-public class NotificationsEventListener extends NotificationEventListener {
+public class PortalNotificationEventListener extends NotificationEventListener {
 
     /**
      * To do not notify him self.

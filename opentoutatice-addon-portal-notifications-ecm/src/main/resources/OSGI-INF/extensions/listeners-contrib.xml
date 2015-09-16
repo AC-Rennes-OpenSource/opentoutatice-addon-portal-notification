@@ -4,10 +4,11 @@
 
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
 		point="listener">
-
+    
+        <!-- Replacment of default listener -->
 		<listener name="notificationListener" async="true"
 			postCommit="true"
-			class="org.osivia.platform.portal.notifications.listener.NotificationsEventListener"
+			class="org.osivia.platform.portal.notifications.listener.PortalNotificationEventListener"
 			priority="120">
 		</listener>
 
