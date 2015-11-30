@@ -74,15 +74,6 @@
 			<event name="commentAdded" />
 		</notification>
 
-
-		<notification name="Forum comment publication" channel="email"
-			enabled="true" availableIn="Forum" autoSubscribed="true" template="workflow"
-			subject="Notification de modération de commentaire" label="label.nuxeo.notifications.workflow">
-			<event name="ForumCommentPublication" />
-		</notification>
-
-
-
 	</extension>
 
 	<extension
