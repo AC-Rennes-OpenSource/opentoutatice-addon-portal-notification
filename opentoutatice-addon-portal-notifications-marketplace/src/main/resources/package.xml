@@ -3,6 +3,7 @@
 	<title>Addon to filter Nuxeo notifications for Osivia Portal</title>
 	<description>
 		<p>Allows to filter Nuxeo notifications for Osivia Portal</p>
+		<p>Allows to subscribe a user to some notifications</p>
 	</description>
 	<home-page>http://www.osivia.com</home-page>
 	<vendor>Osivia</vendor>
@@ -15,7 +16,7 @@
 		<platform>cap-@DISTRIB_VERSION@</platform>
 	</platforms>
 	<dependencies>
-	   <package>open-toutatice:3.2.0-RC01</package>
+	   <package>open-toutatice:3.2.0</package>
 	</dependencies>
 	<license>LGPL 2.1</license>
 	<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>

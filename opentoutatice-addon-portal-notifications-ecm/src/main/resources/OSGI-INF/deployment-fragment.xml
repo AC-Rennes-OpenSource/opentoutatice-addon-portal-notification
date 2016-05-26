@@ -2,8 +2,9 @@
 
 <fragment version="1">
 
+	<require>org.nuxeo.ecm.automation.core</require>	
 	<require>fr.toutatice.ecm.platform.core</require>
-	<require>fr.toutatice.ecm.platform.web</require>	
+	<require>fr.toutatice.ecm.platform.web</require>
 
 	<extension target="pages#PAGES">
 	</extension>

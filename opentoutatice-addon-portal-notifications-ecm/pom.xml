@@ -32,6 +32,14 @@
 			<artifactId>opentoutatice-ecm-platform-web</artifactId>
 			<version>${nuxeo.opentoutatice.version}</version>
 		</dependency>
+
+		<!-- For test purpose only -->
+		<dependency>
+			<groupId>org.nuxeo.ecm.automation</groupId>
+			<artifactId>nuxeo-automation-client</artifactId>
+			<version>${nuxeo.version}</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 
 	<build>

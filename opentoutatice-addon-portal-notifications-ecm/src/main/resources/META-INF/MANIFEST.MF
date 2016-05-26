@@ -7,6 +7,6 @@ Bundle-Activator: org.osivia.platform.portal.notifications.activator.OsiviaBundl
 Bundle-Category: stateful
 Nuxeo-Component: OSGI-INF/extensions/listeners-contrib.xml,
  OSGI-INF/extensions/veto-contrib.xml,
- OSGI-INF/extensions/portal-notifications-contrib.xml
- 
+ OSGI-INF/extensions/portal-notifications-contrib.xml,
+ OSGI-INF/extensions/portal-notifications-automation-contrib.xml
  
