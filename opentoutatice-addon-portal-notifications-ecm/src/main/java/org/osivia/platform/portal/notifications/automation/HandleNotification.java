@@ -16,6 +16,8 @@
  */
 package org.osivia.platform.portal.notifications.automation;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.automation.OperationContext;
@@ -94,7 +96,11 @@ public class HandleNotification {
 		if (NOTIFICATION_ACTION_ADD.equals(action)) {
 			NuxeoPrincipal principal = (NuxeoPrincipal) ctx.getPrincipal();
 			for (String notification : notifications) {
-				notificationManager.addSubscription(prefixedUserId, notification, document, sendEmail, principal, notification);
+				// TR #7138 : Avoid appending multiple subscription on the same event to the same user/group (control not implemented within the "addSubscription" API itself)
+				List<String> subscribers = notificationManager.getSubscribers(notification, document.getId());
+				if (!subscribers.contains(prefixedUserId)) {
+					notificationManager.addSubscription(prefixedUserId, notification, document, sendEmail, principal, notification);
+				}
 			}
 			log.info("Subscibed user '" + userid + "' to the notification '" + notifications + "' on document '" + document.getPathAsString() + "' (UUID=" + document.getId() + ")");
 		} else {

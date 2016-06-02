@@ -34,10 +34,10 @@ public class HandleNotificationTest {
 
 			OperationRequest request = session.newRequest(HandleNotification.ID);
 			request.setInput(new DocRef("/4718229641511231015/sap/dap-musique"));
-			request.set("userid", "Bureau_430"); //"group:Bureau_430"); //"user:mberhaut1");
+			request.set("userid", "user:mberhaut1"); //"group:Bureau_430"); //"user:mberhaut1");
 			request.set("notifications", new String[] {"DUNPublication","DUNUnPublication"});
 			request.set("sendEmail", false);
-			request.set("action", HandleNotification.NOTIFICATION_ACTION_REMOVE);
+			request.set("action", HandleNotification.NOTIFICATION_ACTION_ADD);
 			
 			Object result = request.execute();
 			Assert.assertTrue(null != result);
