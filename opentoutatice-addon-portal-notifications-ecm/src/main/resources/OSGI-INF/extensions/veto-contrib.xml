@@ -9,8 +9,8 @@
 		target="org.nuxeo.ecm.platform.ec.notification.service.NotificationService"
 		point="notificationListenerVeto">
 		
-		<veto name="osiviaNotificationsVeto" class="org.osivia.platform.portal.notifications.veto.NotificationsVeto" />
-		<veto name="routingNotificationsVeto" class="org.osivia.platform.portal.notifications.veto.RoutingNotificationsVeto" />
+		<veto name="ottcNotificationsVeto" class="org.osivia.platform.portal.notifications.veto.NotificationVeto" />
+		<veto name="routingNotificationsVeto" class="org.osivia.platform.portal.notifications.veto.RoutingNotificationVeto" /> 
 		
 	</extension>
 

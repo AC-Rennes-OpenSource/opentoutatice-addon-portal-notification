@@ -8,7 +8,7 @@
         <!-- Replacment of default listener -->
 		<listener name="notificationListener" async="true"
 			postCommit="true"
-			class="org.osivia.platform.portal.notifications.listener.PortalNotificationEventListener"
+			class="org.osivia.platform.portal.notifications.listener.OttcNotificationEventListener"
 			priority="120">
 		</listener>
 

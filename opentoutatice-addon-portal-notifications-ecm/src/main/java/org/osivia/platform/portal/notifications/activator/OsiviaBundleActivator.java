@@ -27,7 +27,7 @@ import org.nuxeo.ecm.platform.ec.notification.NotificationEventListener;
 import org.nuxeo.runtime.api.Framework;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osivia.platform.portal.notifications.listener.PortalNotificationEventListener;
+import org.osivia.platform.portal.notifications.listener.OttcNotificationEventListener;
 
 import fr.toutatice.ecm.platform.core.helper.ToutaticeEmailHelper;
 
@@ -62,8 +62,8 @@ public class OsiviaBundleActivator implements BundleActivator {
         while(iterator.hasNext() && !isPortalNotifier){
             PostCommitEventListener postCommitEventListener = iterator.next();
             
-            if (postCommitEventListener.getClass().equals(PortalNotificationEventListener.class)) {
-                ((PortalNotificationEventListener) postCommitEventListener).setEmailHelper(toutaticeEmailHelper);
+            if (postCommitEventListener.getClass().equals(OttcNotificationEventListener.class)) {
+                ((OttcNotificationEventListener) postCommitEventListener).setEmailHelper(toutaticeEmailHelper);
                 isPortalNotifier = true;
             }
         }

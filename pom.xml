@@ -8,11 +8,11 @@
 	<packaging>pom</packaging>
 	<name>Portal notifications plugin - parent</name>
 	<description>Addon to custom Nuxeo notifications to Portal</description>
-	<version>1.2.2-RC01-SNAPSHOT</version>
+	<version>1.2-SNAPSHOT</version>
 
 	<properties>
-		<nuxeo.version>6.0-HF21</nuxeo.version>
-		<nuxeo.opentoutatice.version>3.2.0</nuxeo.opentoutatice.version>
+		<nuxeo.version>6.0-HF30</nuxeo.version>
+		<nuxeo.opentoutatice.version>3.4.0-SNAPSHOT</nuxeo.opentoutatice.version>
 	</properties>
 
 	<modules>
@@ -71,33 +71,5 @@
 		</snapshotRepository>
 	</distributionManagement>
 	
-	<!--<profiles>
-		<profile>
-			<id>deploy-toutatice-ecm-modules</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-jar</id>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<copy file="${basedir}/target/${project.build.finalName}.jar" todir="${build.toutatice.ecm.modules.dir}/3.1.0" />
-									</tasks>
-								</configuration>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>-->
-
 </project>
 

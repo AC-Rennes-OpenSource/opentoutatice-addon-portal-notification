@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>opentoutatice-ecm.portal-notifications</groupId>
 		<artifactId>opentoutatice-addon-portal-notifications-parent</artifactId>
-		<version>1.2.2-RC01-SNAPSHOT</version>
+		<version>1.2-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -32,6 +32,18 @@
 			<artifactId>opentoutatice-ecm-platform-web</artifactId>
 			<version>${nuxeo.opentoutatice.version}</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-placeful-core</artifactId>
+            <version>${nuxeo.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.version}</version>
+        </dependency>
 
 		<!-- For test purpose only -->
 		<dependency>
@@ -60,33 +72,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>deploy-toutatice-ecm-modules</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-jar</id>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<copy file="${basedir}/target/${project.build.finalName}.jar" todir="${build.toutatice.ecm.modules.dir}/3.1.0" />
-									</tasks>
-								</configuration>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>

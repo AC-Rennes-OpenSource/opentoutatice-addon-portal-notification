@@ -18,22 +18,16 @@
  */
 package org.osivia.platform.portal.notifications.veto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.UnrestrictedSessionRunner;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.platform.ec.notification.NotificationListenerVeto;
 import org.nuxeo.ecm.platform.routing.api.DocumentRoute;
 
-import fr.toutatice.ecm.platform.core.helper.ToutaticeQueryHelper;
 import fr.toutatice.ecm.platform.core.helper.ToutaticeWorkflowHelper;
 
 
@@ -41,7 +35,7 @@ import fr.toutatice.ecm.platform.core.helper.ToutaticeWorkflowHelper;
  * @author David Chevrier.
  *
  */
-public class RoutingNotificationsVeto implements NotificationListenerVeto {
+public class RoutingNotificationVeto implements NotificationListenerVeto {
     
     public static final String GET_WF_ON_DOCUMENT_QUERY = "select * from DocumentRoute where docri:participatingDocuments = '%s' "
             + "and ecm:currentLifeCycleState IN ('ready','running') order by dc:created";
