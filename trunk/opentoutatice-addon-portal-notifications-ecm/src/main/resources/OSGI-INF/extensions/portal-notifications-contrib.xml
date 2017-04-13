@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<component
+	name="org.osivia.platform.portal.notifications.contrib"
+	version="1.0">
+
+    <require>org.nuxeo.ecm.platform.notification.service.NotificationContrib</require>
+    <require>org.nuxeo.ecm.platform.notification.document.routing.NotificationContrib</require>
+	<require>fr.toutatice.ecm.platform.local.publishing.notifications
+	</require>
+
+	<extension
+		target="org.nuxeo.ecm.platform.ec.notification.service.NotificationService"
+		point="notifications">
+
+		<notification name="Modification" channel="email"
+			enabled="true" availableIn="Workspace" autoSubscribed="false"
+			template="portal_modification" subject="Le document ${docTitle} a été modifié"
+			label="label.nuxeo.notifications.modif">
+			<event name="documentModified" />
+		</notification>
+
+
+		<notification name="Creation" channel="email" enabled="true"
+			availableIn="Workspace" autoSubscribed="false" template="portal_creation"
+			subject="Le document ${docTitle} a été ajouté" label="label.nuxeo.notifications.create">
+			<event name="documentCreated" />
+			<event name="documentImported" />
+		</notification>
+
+		<notification name="Task assigned" channel="email"
+			enabled="true" availableIn="Workspace" subject="Une tâche sur le document ${docTitle} vous a été assignée"
+			autoSubscribed="true" template="workflowTaskAssigned"
+			templateExpr="NotificationContext['taskInstance'].getVariable('taskNotificationTemplate')"
+			label="label.nuxeo.notifications.appReviewStarted">
+			<event name="workflowTaskAssigned" />
+		</notification>
+
+        <!--  We exclude Workflows changes of notifications:
+              - enabled false
+              - autoSubscribed true -->
+		<notification name="Workflow Change" enabled="false">
+		    <event name="workflowNewProcessStarted"/>
+	        <event name="workflowProcessEnded"/>
+	        <event name="workflowProcessCanceled"/>
+	        <event name="workflowAbandoned"/>
+	        <event name="workflowTaskCompleted"/>
+	        <event name="workflowTaskRejected"/>
+	        <event name="workflowTaskAssigned"/>
+		</notification>
+		<notification name="Workflow Abandoned" channel="email"
+			enabled="true" availableIn="Workspace" autoSubscribed="false"
+			template="workflow_abandoned" subject="Workflow abandonné sur le document ${docTitle}" label="label.nuxeo.notifications.workflow">
+			<event name="workflowProcessCanceled" />
+			<event name="workflowAbandoned" />
+		</notification>
+		
+		<!-- ${nodeLastActor} is not resolved
+		<notification name="Task done" channel="email"
+            enabled="true" availableIn="Workspace" autoSubscribed="false"
+            template="task_done" subject="${nodeLastActor} a complété sa tâche" label="label.nuxeo.notifications.workflow">
+            <event name="workflowTaskCompleted" />
+            <event name="workflowTaskRejected" />
+        </notification>
+         -->
+
+		<notification name="CommentPublication" enabled="false">
+			<event name="commentPublished" />
+		</notification>
+
+		<notification name="CommentAdded" channel="email"
+			enabled="true" availableIn="all"
+			subject="Un commentaire a été ajouté sur le document ${docTitle}"
+			autoSubscribed="false" template="portal_comment" label="notifications.name.CommentAdded">
+			<event name="commentAdded" />
+		</notification>
+
+	</extension>
+
+	<extension
+		target="org.nuxeo.ecm.platform.ec.notification.service.NotificationService"
+		point="templates">
+
+		<template name="modif" src="templates/modif_fr.ftl" />
+
+        <template name="workflow_abandoned" src="templates/workflow_abandoned_fr.ftl" />
+        <template name="task_done" src="templates/task_done_fr.ftl" />
+		<template name="workflowTaskAssigned" src="templates/workflowTaskAssigned_fr.ftl" />
+
+		<!-- notifs front office -->
+		<template name="portal_creation" src="templates/portal_creation_fr.ftl" />
+		<template name="portal_modification" src="templates/portal_modification_fr.ftl" />
+		<template name="portal_comment" src="templates/portal_comment_fr.ftl" />
+
+	</extension>
+
+</component>

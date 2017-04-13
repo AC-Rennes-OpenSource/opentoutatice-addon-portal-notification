@@ -1,0 +1,23 @@
+<!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
+<package type="addon" name="open-toutatice-addon-portal-notifications" version="@VERSION@">
+	<title>Addon to filter Nuxeo notifications for Osivia Portal</title>
+	<description>
+		<p>Allows to filter Nuxeo notifications for Osivia Portal</p>
+		<p>Allows to subscribe a user to some notifications</p>
+	</description>
+	<home-page>http://www.osivia.com</home-page>
+	<vendor>Osivia</vendor>
+	<installer restart="true" />
+	<uninstaller restart="true" />
+	<nuxeo-validation>none</nuxeo-validation>
+	<production-state>production_ready</production-state>
+	<supported>false</supported>
+	<platforms>
+		<platform>cap-@DISTRIB_VERSION@</platform>
+	</platforms>
+	<dependencies>
+	   <package>open-toutatice:3.4.0-RC06</package>
+	</dependencies>
+	<license>LGPL 2.1</license>
+	<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
+</package>
