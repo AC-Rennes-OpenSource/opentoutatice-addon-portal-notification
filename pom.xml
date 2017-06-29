@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<name>Portal notifications plugin - parent</name>
 	<description>Addon to custom Nuxeo notifications to Portal</description>
-	<version>4.4-SNAPSHOT</version>
+	<version>4.4</version>
 
 	<properties>
 		<nuxeo.version>6.0-HF30</nuxeo.version>
@@ -57,7 +57,7 @@
 	</build>
 
 	<scm>
-		<developerConnection>scm:svn:http://projet.toutatice.fr/repos/toutatice-ecm/opentoutatice-addons/opentoutatice-portal-notifications/branches/4.4-maintenance</developerConnection>
+		<developerConnection>scm:svn:http://projet.toutatice.fr/repos/toutatice-ecm/opentoutatice-addons/opentoutatice-portal-notifications/tags/4.4</developerConnection>
 	</scm>
 
 	<distributionManagement>
