@@ -27,12 +27,6 @@
                         </p><br/>
                      </td>
                     </tr>
-                    <tr>
-                      <td style="background-color:#f7f7f7;border-top:1px dashed #e9ecef;text-align:center;padding:8px 20px;">
-                        <div style="font-size:12px;color:#bbb;">
-                        Vous recevez cette notification car vous avez indiqué vouloir suivre ce document ou un de ses parents. <a href="${baseUrl}/nxhome/default@view_home?tabIds=USER_CENTER%3ANotification">Cliquez-ici</a> pour gérer vos abonnements.</div>
-                      </td>
-                    </tr>
                   </tbody>
                 </table>
               </td>
