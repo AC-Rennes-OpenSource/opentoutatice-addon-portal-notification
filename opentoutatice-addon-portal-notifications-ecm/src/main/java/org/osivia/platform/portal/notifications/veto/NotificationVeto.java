@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
-import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.platform.ec.notification.NotificationListenerVeto;
@@ -62,11 +61,11 @@ public class NotificationVeto implements NotificationListenerVeto {
      * Block system events.
      */
     protected boolean blockSystemEvents(String eventName, NuxeoPrincipal principal) {
-        boolean isSystemInitiator = StringUtils.equalsIgnoreCase(LoginComponent.SYSTEM_USERNAME, principal.getName());
-        if (isSystemInitiator) {
-            return !Arrays.asList(authorizedSystemEvents).contains(eventName);
+    	boolean block = false;
+        if (StringUtils.equalsIgnoreCase(LoginComponent.SYSTEM_USERNAME, principal.getName()) || principal.isAdministrator()) {
+           block = !Arrays.asList(authorizedSystemEvents).contains(eventName);
         }
-        return isSystemInitiator;
+        return block;
     }
 
 }
