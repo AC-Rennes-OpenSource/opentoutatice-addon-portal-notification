@@ -13,8 +13,8 @@
  *
  *
  * Contributors:
- *   dchevrier
- *    
+ * dchevrier
+ * 
  */
 package org.osivia.platform.portal.notifications.veto;
 
@@ -36,12 +36,12 @@ import fr.toutatice.ecm.platform.core.helper.ToutaticeWorkflowHelper;
  *
  */
 public class RoutingNotificationVeto implements NotificationListenerVeto {
-    
+
     public static final String GET_WF_ON_DOCUMENT_QUERY = "select * from DocumentRoute where docri:participatingDocuments = '%s' "
             + "and ecm:currentLifeCycleState IN ('ready','running') order by dc:created";
-    
+
     @Override
-    public boolean accept(Event event) throws Exception {
+    public boolean accept(Event event) {
         boolean accept = true;
 
         if (DocumentEventTypes.DOCUMENT_UPDATED.equals(event.getName())) {
@@ -56,6 +56,6 @@ public class RoutingNotificationVeto implements NotificationListenerVeto {
 
         return accept;
     }
-    
+
 
 }

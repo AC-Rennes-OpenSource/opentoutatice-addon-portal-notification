@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
-import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.platform.ec.notification.NotificationListenerVeto;
@@ -47,7 +46,7 @@ public class NotificationVeto implements NotificationListenerVeto {
             TaskEventNames.WORKFLOW_TASK_ASSIGNED, TaskEventNames.WORKFLOW_TASK_COMPLETED, TaskEventNames.WORKFLOW_TASK_REJECTED};
 
     @Override
-    public boolean accept(Event event) throws Exception {
+    public boolean accept(Event event) {
         if (event.getContext() instanceof DocumentEventContext) {
             String eventName = event.getName();
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();

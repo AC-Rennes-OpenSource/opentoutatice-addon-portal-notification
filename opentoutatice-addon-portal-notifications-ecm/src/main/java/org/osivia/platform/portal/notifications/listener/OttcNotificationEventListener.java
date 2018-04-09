@@ -23,7 +23,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -47,7 +47,7 @@ public class OttcNotificationEventListener extends NotificationEventListener {
      * methods are checked.
      */
     @Override
-    protected void sendNotificationSignalForUser(Notification notification, String subscriptor, Event event, DocumentEventContext ctx) throws ClientException {
+    protected void sendNotificationSignalForUser(Notification notification, String subscriptor, Event event, DocumentEventContext ctx) throws NuxeoException {
         /* We don't apply rules for (automatic) Email notification. */
         // FIXME: think about autosubscribed notifications?
         if (DocumentEventTypes.EMAIL_DOCUMENT_SEND.equals(event.getName())) {
@@ -75,7 +75,7 @@ public class OttcNotificationEventListener extends NotificationEventListener {
             subscriptorSession = CoreInstance.openCoreSession(null);
             return !blockUserWhenSubscriptor(ctx, subscriptor);
         } catch (LoginException lie) {
-            throw new ClientException(lie);
+            throw new NuxeoException(lie);
         } finally {
             if (subscriptorSession != null) {
                 CoreInstance.closeCoreSession(subscriptorSession);
@@ -84,7 +84,7 @@ public class OttcNotificationEventListener extends NotificationEventListener {
                 try {
                     loginContext.logout();
                 } catch (LoginException loe) {
-                    throw new ClientException(loe);
+                    throw new NuxeoException(loe);
                 }
             }
         }

@@ -8,27 +8,27 @@
 	<packaging>pom</packaging>
 	<name>Portal notifications plugin - parent</name>
 	<description>Addon to custom Nuxeo notifications to Portal</description>
-	<version>4.6.1</version>
+	<version>4.8-SNAPSHOT</version>
 
 	<properties>
-		<nuxeo.version>6.0-HF42</nuxeo.version>
-		<nuxeo.cap.version>6.0</nuxeo.cap.version>
-		<nuxeo.opentoutatice.version>4.6.5</nuxeo.opentoutatice.version>
+		<nuxeo.version>8.10-HF27</nuxeo.version>
+		<!-- <nuxeo.cap.version>6.0</nuxeo.cap.version> -->
+		<nuxeo.opentoutatice.version>4.8-SNAPSHOT</nuxeo.opentoutatice.version>
 	</properties>
 
 	<modules>
 		<module>opentoutatice-addon-portal-notifications-ecm</module>
-		<module>opentoutatice-addon-portal-notifications-marketplace</module>
+		<!-- <module>opentoutatice-addon-portal-notifications-marketplace</module> -->
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-			 <dependency>
+			 <!-- <dependency>
 				<groupId>org.nuxeo.ecm.distribution</groupId>
 				<artifactId>nuxeo-distribution-cap</artifactId>
 				<version>${nuxeo.version}</version>
 				<type>pom</type>
-			</dependency>
+			</dependency> -->
 
 			<dependency>
 				<groupId>opentoutatice-ecm.platform</groupId>
@@ -44,12 +44,6 @@
 				<groupId>opentoutatice-ecm.platform</groupId>
 				<artifactId>opentoutatice-ecm-platform-web</artifactId>
 				<version>${nuxeo.opentoutatice.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.nuxeo.ecm.platform</groupId>
-				<artifactId>nuxeo-platform-placeful-core</artifactId>
-				<version>${nuxeo.version}</version>
 			</dependency>
 
 			<dependency>
