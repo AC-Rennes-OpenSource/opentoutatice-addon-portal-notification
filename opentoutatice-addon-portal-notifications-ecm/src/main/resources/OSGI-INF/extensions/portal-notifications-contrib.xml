@@ -26,6 +26,13 @@
 			<event name="documentCreated" />
 			<event name="documentImported" />
 		</notification>
+		
+		<notification name="Deletion" channel="email"
+			enabled="true" availableIn="Workspace" autoSubscribed="false"
+			template="portal_deletion" subject="Le document ${docTitle} a été supprimé"
+			label="label.nuxeo.notifications.remove">
+			<event name="ttcDocumentTrashed" />
+		</notification>
 
 		<notification name="Task assigned" channel="email"
 			enabled="true" availableIn="Workspace" subject="Une tâche sur le document ${docTitle} vous a été assignée"
@@ -88,6 +95,7 @@
 
 		<!-- notifs front office -->
 		<template name="portal_creation" src="templates/portal_creation_fr.ftl" />
+		<template name="portal_deletion" src="templates/portal_deletion_fr.ftl" />		
 		<template name="portal_modification" src="templates/portal_modification_fr.ftl" />
 		<template name="portal_comment" src="templates/portal_comment_fr.ftl" />
 
