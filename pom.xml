@@ -13,7 +13,7 @@
 	<properties>
 		<nuxeo.version>6.0-HF45</nuxeo.version>
 		<nuxeo.cap.version>6.0</nuxeo.cap.version>
-		<nuxeo.opentoutatice.version>4.7-SNAPSHOT</nuxeo.opentoutatice.version>
+		<nuxeo.opentoutatice.version>4.7.14-RC2</nuxeo.opentoutatice.version>
 	</properties>
 
 	<modules>
@@ -85,6 +85,17 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			
+            <!-- Disable strict javadoc checking since java8 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
+                </configuration>
+            </plugin>			
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -104,22 +115,7 @@
 		<developerConnection>scm:git:ssh://git@github.com/osivia/opentoutatice-addon-portal-notification.git</developerConnection>     
 		<tag>HEAD</tag> 
 	</scm>
-	
 
-    <profiles>
-    	<profile>
-    		<id>ci</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<distributionManagement>
-    			<snapshotRepository>
-            		<id>galactica-ci-snapshots</id>
-            		<url>http://nexus:8081/repository/ci-snapshots</url>
-        		</snapshotRepository>
-    		</distributionManagement>
-    	</profile>
-    </profiles>
     
     <distributionManagement>
         <repository>
