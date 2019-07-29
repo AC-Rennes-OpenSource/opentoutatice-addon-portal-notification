@@ -13,14 +13,15 @@
  *
  *
  * Contributors:
- *   dchevrier
- *    
+ * dchevrier
+ * 
  */
 package org.osivia.platform.portal.notifications.veto;
 
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.event.Event;
@@ -36,26 +37,29 @@ import fr.toutatice.ecm.platform.core.helper.ToutaticeWorkflowHelper;
  *
  */
 public class RoutingNotificationVeto implements NotificationListenerVeto {
-    
+
     public static final String GET_WF_ON_DOCUMENT_QUERY = "select * from DocumentRoute where docri:participatingDocuments = '%s' "
             + "and ecm:currentLifeCycleState IN ('ready','running') order by dc:created";
-    
+
     @Override
     public boolean accept(Event event) throws Exception {
         boolean accept = true;
 
         if (DocumentEventTypes.DOCUMENT_UPDATED.equals(event.getName())) {
+            if (event.getContext() instanceof DocumentEventContext) {
+                DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
+                DocumentModel sourceDocument = docCtx.getSourceDocument();
+                CoreSession session = docCtx.getCoreSession();
 
-            DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
-            DocumentModel sourceDocument = docCtx.getSourceDocument();
-
-            List<DocumentRoute> workflowsOnDocument = ToutaticeWorkflowHelper.getWorkflowsOnDocument(sourceDocument);
-            accept = CollectionUtils.isEmpty(workflowsOnDocument);
-
+                if (session.exists(sourceDocument.getRef())) {
+                    List<DocumentRoute> workflowsOnDocument = ToutaticeWorkflowHelper.getWorkflowsOnDocument(sourceDocument);
+                    accept = CollectionUtils.isEmpty(workflowsOnDocument);
+                }
+            }
         }
 
         return accept;
     }
-    
+
 
 }

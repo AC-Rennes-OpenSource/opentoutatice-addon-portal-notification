@@ -8,28 +8,19 @@
 	<packaging>pom</packaging>
 	<name>Portal notifications plugin - parent</name>
 	<description>Addon to custom Nuxeo notifications to Portal</description>
-	<version>4.7.17</version>
+	<version>4.7-SNAPSHOT</version>
 
 	<properties>
-		<nuxeo.version>6.1.0</nuxeo.version>
-		<!-- <nuxeo.cap.version>6.0</nuxeo.cap.version> -->
-		<opentoutatice.version>4.7.17</opentoutatice.version>
+		<nuxeo.version>6.1.1</nuxeo.version>
+		<opentoutatice.version>4.7-SNAPSHOT</opentoutatice.version>
 	</properties>
 
 	<modules>
 		<module>opentoutatice-addon-portal-notifications-ecm</module>
-		<!-- <module>opentoutatice-addon-portal-notifications-marketplace</module> -->
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-			 <dependency>
-				<groupId>org.nuxeo.ecm.distribution</groupId>
-				<artifactId>nuxeo-distribution-cap</artifactId>
-				<version>${nuxeo.version}</version>
-				<type>pom</type>
-			</dependency>
-
 			<dependency>
 				<groupId>opentoutatice-ecm.platform</groupId>
 				<artifactId>opentoutatice-ecm-platform-core</artifactId>
