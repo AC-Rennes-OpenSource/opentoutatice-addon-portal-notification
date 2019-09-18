@@ -11,14 +11,13 @@
 	<version>4.4-SNAPSHOT</version>
 
 	<properties>
-		<nuxeo.version>6.0-HF44</nuxeo.version>
-		<nuxeo.cap.version>6.0</nuxeo.cap.version>
-		<nuxeo.opentoutatice.version>4.4.13.5</nuxeo.opentoutatice.version>
+		<nuxeo.version>6.1.1</nuxeo.version>	
+		<nuxeo.opentoutatice.version>4.4-SNAPSHOT</nuxeo.opentoutatice.version>
 	</properties>
 
 	<modules>
 		<module>opentoutatice-addon-portal-notifications-ecm</module>
-		<module>opentoutatice-addon-portal-notifications-marketplace</module>
+		<!-- <module>opentoutatice-addon-portal-notifications-marketplace</module>  -->
 	</modules>
 
 	<dependencyManagement>
