@@ -3,10 +3,9 @@
 	name="org.osivia.platform.portal.notifications.contrib"
 	version="1.0">
 
-    <require>org.nuxeo.ecm.platform.notification.service.NotificationContrib</require>
-    <require>org.nuxeo.ecm.platform.notification.document.routing.NotificationContrib</require>
 	<require>fr.toutatice.ecm.platform.local.publishing.notifications
 	</require>
+	<require>fr.toutatice.ecm.platform.remote.publishing.notifications</require>
 
 	<extension
 		target="org.nuxeo.ecm.platform.ec.notification.service.NotificationService"
@@ -32,6 +31,24 @@
 			template="portal_deletion" subject="Le document ${docTitle} a été supprimé"
 			label="label.nuxeo.notifications.remove">
 			<event name="ttcDocumentTrashed" />
+		</notification>
+		
+		<!-- Local publication (SetOnLine) & remote publication are unified in Portal point of view -->
+		<notification name="ToutaticePublication" enabled="false" />
+		<notification name="OnLineWF" enabled="false" />
+		
+		<notification autoSubscribed="false" availableIn="Section,PortalSite"
+			channel="email" enabled="true" name="portalPublish" subjectTemplate="portal_publish_subject"
+			template="portal_publish" label="label.nuxeo.notifications.publish">
+			<event name="documentSetOnLine" />
+			<event name="workflowOnlineTaskAssigned" />
+			<event name="workflowOnlineCanceled" /> 
+			<event name="workflowOnlineTaskApproved" />
+			<event name="workflowOnlineTaskRejected" />
+			<event name="documentPublished" />
+			<event name="documentPublicationApproved" />
+			<event name="documentWaitingPublication" />
+			<event name="documentPublicationRejected" />
 		</notification>
 
 		<notification name="Task assigned" channel="email"
@@ -98,6 +115,8 @@
 		<template name="portal_deletion" src="templates/portal_deletion_fr.ftl" />		
 		<template name="portal_modification" src="templates/portal_modification_fr.ftl" />
 		<template name="portal_comment" src="templates/portal_comment_fr.ftl" />
+		<template name="portal_publish_subject" src="templates/portal_publish_subject_fr.ftl" />
+		<template name="portal_publish" src="templates/portal_publish_fr.ftl" />
 
 	</extension>
 
