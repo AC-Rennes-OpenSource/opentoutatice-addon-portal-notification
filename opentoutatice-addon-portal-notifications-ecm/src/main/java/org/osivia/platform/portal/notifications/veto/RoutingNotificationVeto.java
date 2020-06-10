@@ -43,13 +43,13 @@ public class RoutingNotificationVeto implements NotificationListenerVeto {
     @Override
     public boolean accept(Event event) throws Exception {
         boolean accept = true;
-
+        
         if (DocumentEventTypes.DOCUMENT_UPDATED.equals(event.getName())) {
 
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
             DocumentModel sourceDocument = docCtx.getSourceDocument();
 
-            List<DocumentRoute> workflowsOnDocument = ToutaticeWorkflowHelper.getWorkflowsOnDocument(sourceDocument);
+            List<DocumentRoute> workflowsOnDocument = ToutaticeWorkflowHelper.getWorkflowsOnDocument(event.getContext().getCoreSession(), sourceDocument);
             accept = CollectionUtils.isEmpty(workflowsOnDocument);
 
         }
