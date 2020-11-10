@@ -29,9 +29,8 @@ import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.platform.ec.notification.NotificationListenerVeto;
 import org.nuxeo.ecm.platform.task.TaskEventNames;
+import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.api.login.LoginComponent;
-
-import fr.toutatice.ecm.platform.core.trash.ToutaticeTrashServiceImpl;
 
 
 /**
@@ -52,24 +51,6 @@ public class NotificationVeto implements NotificationListenerVeto {
         if (event.getContext() instanceof DocumentEventContext) {
             String eventName = event.getName();
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
-            
-            // #1856 notifications forbidden for folderish documents
-            if(docCtx.getSourceDocument() != null) {
-            	String sourceDocumentType = docCtx.getSourceDocument().getType();
-            	boolean folderish = docCtx.getSourceDocument().hasFacet("Folderish");
-            	if(folderish) {
-            		
-            		// except for put in trash actions
-            		if(!event.getName().equals(ToutaticeTrashServiceImpl.EVENT_NAME_DOC_TRASHED)) {
-            			return false;
-            		}
-            		
-            	}
-            	// #1856 notifications forbidden for staples
-            	else if (sourceDocumentType.equals("Staple")) {
-            		return false;
-            	}
-            }
 
             NuxeoPrincipal originatingPrincipal = (NuxeoPrincipal) docCtx.getPrincipal();
             return !blockSystemEvents(eventName, originatingPrincipal);
@@ -81,8 +62,14 @@ public class NotificationVeto implements NotificationListenerVeto {
      * Block system events.
      */
     protected boolean blockSystemEvents(String eventName, NuxeoPrincipal principal) {
+    	
+    	String defaultAdministratorId = Framework.getProperty("nuxeo.ldap.defaultAdministratorId");
+		if(defaultAdministratorId == null) {
+			defaultAdministratorId = "Administrator";
+		}
+		
     	boolean block = false;
-        if (StringUtils.equalsIgnoreCase(LoginComponent.SYSTEM_USERNAME, principal.getName())) {
+        if (StringUtils.equalsIgnoreCase(LoginComponent.SYSTEM_USERNAME, principal.getName()) || StringUtils.equalsIgnoreCase(defaultAdministratorId, principal.getName())) {
            block = !Arrays.asList(authorizedSystemEvents).contains(eventName);
         }
         return block;
