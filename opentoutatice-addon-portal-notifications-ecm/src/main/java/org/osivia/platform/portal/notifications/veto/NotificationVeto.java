@@ -32,6 +32,7 @@ import org.nuxeo.ecm.platform.task.TaskEventNames;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.api.login.LoginComponent;
 
+import fr.toutatice.ecm.platform.automation.PublishDocument;
 
 /**
  * @author David Chevrier.
@@ -44,7 +45,8 @@ public class NotificationVeto implements NotificationListenerVeto {
 
     /** Authorized systems events. */
     public final static String[] authorizedSystemEvents = {TaskEventNames.WORKFLOW_CANCELED, TaskEventNames.WORKFLOW_ABANDONED,
-            TaskEventNames.WORKFLOW_TASK_ASSIGNED, TaskEventNames.WORKFLOW_TASK_COMPLETED, TaskEventNames.WORKFLOW_TASK_REJECTED};
+            TaskEventNames.WORKFLOW_TASK_ASSIGNED, TaskEventNames.WORKFLOW_TASK_COMPLETED, TaskEventNames.WORKFLOW_TASK_REJECTED,
+            PublishDocument.DOCUMENT_SET_ON_LINE};
 
     @Override
     public boolean accept(Event event) throws Exception {
