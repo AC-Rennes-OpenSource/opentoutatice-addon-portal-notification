@@ -19,7 +19,9 @@
  */
 package org.osivia.platform.portal.notifications.veto;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -32,8 +34,6 @@ import org.nuxeo.ecm.platform.task.TaskEventNames;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.api.login.LoginComponent;
 
-import fr.toutatice.ecm.platform.automation.PublishDocument;
-
 /**
  * @author David Chevrier.
  *
@@ -42,6 +42,8 @@ public class NotificationVeto implements NotificationListenerVeto {
 
     /** Logger. */
     private final static Log log = LogFactory.getLog(NotificationVeto.class);
+    
+    private List<String> systemUsers;
 
     /** Authorized systems events. */
     public final static String[] authorizedSystemEvents = {TaskEventNames.WORKFLOW_CANCELED, TaskEventNames.WORKFLOW_ABANDONED,
@@ -64,17 +66,55 @@ public class NotificationVeto implements NotificationListenerVeto {
      */
     protected boolean blockSystemEvents(String eventName, NuxeoPrincipal principal) {
     	
-    	String defaultAdministratorId = Framework.getProperty("nuxeo.ldap.defaultAdministratorId");
-		if(defaultAdministratorId == null) {
-			defaultAdministratorId = "Administrator";
-		}
-		
+    	List<String> systemUsers = getSystemUsers();
+    	
     	boolean block = false;
-        if (StringUtils.equalsIgnoreCase(LoginComponent.SYSTEM_USERNAME, principal.getName()) || StringUtils.equalsIgnoreCase(defaultAdministratorId, principal.getName())) {
+    	
+    	// block all system user events
+        if (systemUsers.contains(principal.getName())) {
+        	
+        	// except for workflow tasks
+        	
            block = !Arrays.asList(authorizedSystemEvents).contains(eventName);
         }
+        
         return block;
     }
+
+	private List<String> getSystemUsers() {
+		if(systemUsers == null) {
+			
+			systemUsers = new ArrayList<String>();
+			
+			// system
+			systemUsers.add(LoginComponent.SYSTEM_USERNAME);
+			
+			// Administrator
+	    	String defaultAdministratorId = Framework.getProperty("nuxeo.ldap.defaultAdministratorId");
+			if(defaultAdministratorId == null) {
+				defaultAdministratorId = "Administrator";
+			}
+			systemUsers.add(defaultAdministratorId);
+			
+			// other accounts
+			String vetoForUsers = Framework.getProperty("notification.veto.users");
+			if(StringUtils.isNotBlank(vetoForUsers)) {
+				String[] split = vetoForUsers.split(",");
+				
+				for(int i = 0; i < split.length; i++) {
+					String vetoUser = StringUtils.trim(split[i]);
+					
+					if(StringUtils.isNotBlank(vetoUser)) {
+						systemUsers.add(vetoUser);
+					}
+				}
+			}
+			
+		}
+		
+		
+		return systemUsers;
+	}
 
 
 }
