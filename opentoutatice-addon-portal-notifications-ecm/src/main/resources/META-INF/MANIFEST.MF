@@ -8,5 +8,6 @@ Bundle-Category: stateful
 Nuxeo-Component: OSGI-INF/extensions/listeners-contrib.xml,
  OSGI-INF/extensions/veto-contrib.xml,
  OSGI-INF/extensions/portal-notifications-contrib.xml,
- OSGI-INF/extensions/portal-notifications-automation-contrib.xml
+ OSGI-INF/extensions/portal-notifications-automation-contrib.xml,
+ OSGI-INF/extensions/core-types-contrib.xml
  

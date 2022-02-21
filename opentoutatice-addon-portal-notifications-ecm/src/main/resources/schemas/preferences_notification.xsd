@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:nxs="http://www.nuxeo.org/ecm/project/schemas/preferences_notification" targetNamespace="http://www.nuxeo.org/ecm/project/schemas/preferences_notification">  
+
+  <xs:simpleType name="stringList"> 
+    <xs:list itemType="xs:string"/> 
+  </xs:simpleType>  
+  
+  <xs:element name="user_id" type="xs:string"/>
+  <xs:element name="space_id" type="xs:string"/>
+  <xs:element name="frequency" type="xs:string"/>
+  <xs:element name="channel" type="xs:string"/>
+  <xs:element name="paths" type="nxs:stringList"/>
+  <xs:element name="lastNewsDate" type="xs:date"/>
+  <xs:element name="nextNewsDate" type="xs:date"/>
+  
+  
+</xs:schema>

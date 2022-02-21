@@ -7,6 +7,7 @@
 		point="operations">
 
 		<operation class="org.osivia.platform.portal.notifications.automation.HandleNotification" />
+		<operation class="org.osivia.platform.portal.notifications.automation.CreatePrefDoc" />
 		
 	</extension>
 
