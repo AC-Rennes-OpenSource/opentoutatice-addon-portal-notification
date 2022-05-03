@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<component name="org.osivia.platform.portal.notifications.services">
+
+    <service>
+        <provide interface="org.osivia.platform.portal.notifications.service.UserPreferencesService" />
+    </service>
+    
+    <implementation class="org.osivia.platform.portal.notifications.service.UserPreferencesServiceImpl" />
+    
+</component>
