@@ -6,13 +6,13 @@
     <xs:list itemType="xs:string"/> 
   </xs:simpleType>  
   
-  <xs:element name="user_id" type="xs:string"/>
-  <xs:element name="space_id" type="xs:string"/>
-  <xs:element name="frequency" type="xs:string"/>
-  <xs:element name="channel" type="xs:string"/>
+  <xs:element name="utilisateur" type="xs:string"/>
+  <xs:element name="espace" type="xs:string"/>
+  <xs:element name="freq" type="xs:string"/>
+  <xs:element name="canal" type="xs:string"/>
   <xs:element name="paths" type="nxs:stringList"/>
-  <xs:element name="lastNewsDate" type="xs:date"/>
-  <xs:element name="nextNewsDate" type="xs:date"/>
+  <xs:element name="derniereNotif" type="xs:date"/>
+  <xs:element name="prochaineNotif" type="xs:date"/>
   
-  
+
 </xs:schema>

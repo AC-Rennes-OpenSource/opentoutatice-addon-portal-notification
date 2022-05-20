@@ -10,6 +10,7 @@
 	<extension target="org.nuxeo.ecm.core.schema.TypeService"
 		point="schema">
         <schema name="preferences_notification" prefix="ttcpn" src="schemas/preferences_notification.xsd" /> 	
+		<schema name="notification" prefix="ntf" src="schemas/notification.xsd" /> 	
 		
 	</extension>
 		
@@ -37,6 +38,7 @@
 		</doctype>
 		<doctype name="Notification" extends="Document">
 			<schema name="dublincore" />
+			<schema name="notification" />
 		</doctype>
 		
 		
@@ -44,12 +46,12 @@
 	
 	<extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService" point="types">
 		<types>
-		    <type name="ConteneurPreferences">default</type>
-			<type name="PreferencesUtilisateur">default</type>
-			<type name="PreferencesNotification">default</type>
-		    <type name="ConteneurNotifications">default</type>
-			<type name="NotificationsUtilisateur">default</type>
-			<type name="Notification">default</type>			
+		    <type name="ConteneurPreferences">default_toutatice</type>
+			<type name="PreferencesUtilisateur">default_toutatice</type>
+			<type name="PreferencesNotification">default_toutatice</type>
+		    <type name="ConteneurNotifications">default_toutatice</type>
+			<type name="NotificationsUtilisateur">default_toutatice</type>
+			<type name="Notification">default_toutatice</type>			
 		</types>
 	</extension>	
 	
@@ -126,10 +128,30 @@
 			<subtypes>
 				<type>Notification</type>
 			</subtypes>
+			<category>Service</category>
+			<label>Notifications utilisateur</label>
+			<icon>/img/folder_notif.png</icon>
+			<bigIcon>/img/folder_notif.png</bigIcon>
+			<description>Notifications utilisateur</description>
+			<default-view>view_documents</default-view>
+			<layouts mode="any">
+				<layout>heading</layout>
+			</layouts>			
 			
 		</type>		
-				
-		
+
+		<type id="Notification">
+			<category>Document</category>
+			<label>Notification</label>
+			<icon>/img/notif.jpg</icon>
+			<bigIcon>/img/notif.jpg</bigIcon>
+			<description>Notification</description>
+			<default-view>view_documents</default-view>
+			<layouts mode="any">
+				<layout>heading</layout>
+			</layouts>			
+			
+		</type>	
 	</extension>
 	
 	<extension point="filters"

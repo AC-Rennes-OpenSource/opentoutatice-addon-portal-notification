@@ -12,15 +12,20 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
 import org.osivia.platform.portal.notifications.service.UserPreferencesService;
 
-@Operation(id = CreatePrefDoc.ID, category = Constants.CAT_NOTIFICATION, label = "Create a notification preference"
-		+ "Create all documents about a user and a workspace for notifications")
-		
-public class CreatePrefDoc {
+/**
+ * Create and save user notification preferences
+ * 
+ * @author Loïc Billon
+ *
+ */
+@Operation(id = SavePreferences.ID, category = Constants.CAT_NOTIFICATION, label = "Save notification preferences"
+		+ "Save notification preferences for a user on a workspace")
+public class SavePreferences {
 	
 
-    protected static final Log log = LogFactory.getLog(CreatePrefDoc.class);
+    protected static final Log log = LogFactory.getLog(SavePreferences.class);
 
-    public static final String ID = "Notification.CreatePrefDoc";
+    public static final String ID = "Notification.SavePreferences";
 
     @Context
     protected CoreSession session;
@@ -38,13 +43,8 @@ public class CreatePrefDoc {
     public DocumentModel run() throws Exception {
 
     	UserPreferencesService service = Framework.getService(UserPreferencesService.class);
-    	DocumentModel userNotif = service.getOrCreatePrefDoc(session, spaceId, username);
-    	
-    	if(freq != null) {
-    		userNotif.setPropertyValue("ttcpn:frequency", freq);
-    		session.saveDocument(userNotif);
-    	}
-    	
+    	DocumentModel userNotif = service.savePreferences(session, spaceId, username, freq);
+
     	return userNotif;
     	
     }

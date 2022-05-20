@@ -1,8 +1,13 @@
 package org.osivia.platform.portal.notifications.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -12,34 +17,31 @@ import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.UnrestrictedSessionRunner;
-import org.nuxeo.ecm.core.api.security.ACE;
-import org.nuxeo.ecm.core.api.security.ACL;
-import org.nuxeo.ecm.core.api.security.ACP;
-import org.nuxeo.ecm.core.api.security.impl.ACLImpl;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.directory.ldap.LDAPDirectory;
 import org.nuxeo.ecm.directory.ldap.LDAPSession;
+import org.nuxeo.ecm.webengine.jaxrs.session.SessionFactory;
 import org.nuxeo.runtime.api.Framework;
+import org.osivia.platform.portal.notifications.batch.NotificationBean;
+import org.osivia.platform.portal.notifications.batch.NotificationFrequency;
+import org.osivia.platform.portal.notifications.batch.NotificationsHelper;
+import org.osivia.platform.portal.notifications.batch.NotifiedDocument;
 import org.osivia.platform.portal.notifications.service.DocumentNotificationInfosProviderImpl.SubscriptionStatus;
 
 import fr.toutatice.ecm.platform.core.helper.ToutaticeDocumentHelper;
 
 public class UserPreferencesServiceImpl implements UserPreferencesService {
 	
-    protected static final Log log = LogFactory.getLog(UserPreferencesServiceImpl.class);
+    protected static final Log log = LogFactory.getLog("fr.toutatice.notifications");
     
-	private final String preferencesPath;
+	private LDAPSession ldapSession;
 
-	private LDAPSession session;
-
-	private String repository;
+	private String notifRepository;
 
 
 	public UserPreferencesServiceImpl() {
 		
-		preferencesPath = Framework.getProperty("ottc.notifs.preferencesPath", "/preferences//conteneur-preferences");
-    	repository = Framework.getProperty("ottc.notifications.repository", "notificationRepo");
+    	notifRepository = Framework.getProperty("ottc.notifications.repository", "notificationRepo");
 
 	}
 	
@@ -52,97 +54,42 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 	 */
 	private DocumentModel getLdapEntry(String login) {
 		DocumentModel entry = null;
-		if(session != null) {
+		if(ldapSession != null) {
 			try {
-				entry = session.getEntryFromSource(login, false);
+				entry = ldapSession.getEntryFromSource(login, false);
 			}
 			catch(ClientException e) {
-				session = null;
+				ldapSession = null;
 			}
 		}
 		
-		if(session == null) {
+		if(ldapSession == null) {
 			
 			DirectoryService service = Framework.getService(DirectoryService.class);
 			LDAPDirectory directory = (LDAPDirectory) service.getDirectory("userLdapDirectory");
 			
-			session = (LDAPSession) directory.getSession();
+			ldapSession = (LDAPSession) directory.getSession();
 			
-			entry = session.getEntryFromSource(login,false);
+			entry = ldapSession.getEntryFromSource(login,false);
 
 		}
 		
 		return entry;
 	}
 	
-	public void subscribe(CoreSession session, DocumentModel currentDocument) {
-		
-		if(getStatus(session, currentDocument) == SubscriptionStatus.can_subscribe) {
-			
-
-			// get workspaceId of the current document
-			String workspaceId = null;
-			DocumentModel workspace = ToutaticeDocumentHelper.getWorkspace(session, currentDocument, true);
-			if(workspace != null) {
-				workspaceId = workspace.getProperty("webc:url").getValue(String.class);
-				
-			}
-			else {
-				throw new ClientException("User can not subscribe to this document");
-			}
-			
-			DocumentModel ldapEntry = getLdapEntry(session.getPrincipal().getName());
-			String personUid = ldapEntry.getProperty("pseudonymizedId").getValue(String.class);
-			
-			if(StringUtils.isBlank(personUid)) {
-				throw new ClientException("User can not subscribe to this document");
-
-			}
-
-        	CoreSession notificationRepoSession = CoreInstance.openCoreSession(repository);
-			
-			DocumentModel prefDoc = getOrCreatePrefDoc(notificationRepoSession, workspaceId, personUid);
-			String[] paths = (String[]) prefDoc.getPropertyValue("ttcpn:paths");
-			String[] newPaths = null;
-			if(paths != null) {
-				List<String> pathsList = new ArrayList<String>(Arrays.asList(paths));
-				pathsList.add(currentDocument.getPathAsString());
-				newPaths = new String[pathsList.size()];
-				pathsList.toArray(newPaths);
-			}
-			else {
-				newPaths = new String[1];
-				newPaths[0] = currentDocument.getPathAsString();
-			}
 
 
-			prefDoc.setPropertyValue("ttcpn:paths", newPaths);
-			
-			notificationRepoSession.saveDocument(prefDoc);
-			
-			CoreInstance.closeCoreSession(notificationRepoSession);
-			
-		}
-	}
-	
-	public SubscriptionStatus getStatus(CoreSession session, DocumentModel currentDocument) {
-		
-		boolean sessionOpened = false;
-		if(session.getRepositoryName().equals("default")) {
-			session = CoreInstance.openCoreSession(repository);
-			sessionOpened = true;
-			
-		}
+	protected SubscriptionStatus getStatusInRepo(CoreSession notifSession, DocumentModel currentDocument) {
 		
 		
         SubscriptionStatus status = SubscriptionStatus.no_subscriptions;
 		
     	// Test if doc for current space exists
-    	DocumentModelList userNotifs = session.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND ecm:currentLifeCycleState != 'deleted'");
+    	DocumentModelList userNotifs = notifSession.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0");
     	
     	searchpath:
     	for(DocumentModel userNotif : userNotifs) {
-    		String[] paths = (String[]) userNotif.getPropertyValue("ttcpn:paths");
+    		String[] paths = (String[]) userNotif.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
     		
     		for(String path : paths) {
     			if(currentDocument.getPathAsString().equals(path)) {
@@ -160,40 +107,86 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
     		status = SubscriptionStatus.can_subscribe;
     	}
     	
-    	if(sessionOpened) {
-    		CoreInstance.closeCoreSession(session);
-    	}
-    	
     	return status;
 		
 	}
 
-	public DocumentModel getOrCreatePrefDoc(CoreSession session, String workspaceId, String username) {
-
-    	DocumentModelList userNotifs = session.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND ttcpn:user_id = '"+
-    			username+"' AND ttcpn:space_id = '"+workspaceId+"' AND ecm:currentLifeCycleState != 'deleted'");
+	
+	protected DocumentModel getPreferences(CoreSession notifSession, String workspaceId, String username) {
+		
+    	DocumentModelList userNotifs = notifSession.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND "+UserPreferencesService.TTCPN_USERID+" = '"+
+    			username+"' AND "+UserPreferencesService.TTCPN_SPACEID+" = '"+workspaceId+"' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0");
     	
     	if(userNotifs.size() == 0) {
-    		String currentUsername = session.getPrincipal().getName();
+    		String currentUsername = notifSession.getPrincipal().getName();
     		
-    		SetUnrestrictedPrefs runner = new SetUnrestrictedPrefs(session, preferencesPath, username, currentUsername, workspaceId);
+    		UnrestritctedPreferencesCreator runner = new UnrestritctedPreferencesCreator(notifSession, username, currentUsername, workspaceId);
     		runner.runUnrestricted();
     		
-    		return runner.getUserNotif();
+    		return runner.getPref();
     		
     	}
     	else if(userNotifs.size() == 1) {
     		return userNotifs.get(0);
     	}
     	else throw new ClientException();
-    	
-    	
 	}
 
-	@Override
-	public void unsubscribe(CoreSession session, DocumentModel currentDocument) {
+
+	protected DocumentModel getNotificationFolder(CoreSession notifSession) {
+    	// === Test if folder notifs exists
+    	DocumentModelList userNotifs = notifSession.query("SELECT * FROM Document WHERE ecm:primaryType = 'NotificationsUtilisateur' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0");
+    	
+    	return userNotifs.get(0);
 		
-		if(getStatus(session, currentDocument) == SubscriptionStatus.can_unsubscribe) {
+	}
+	
+	// --------------------------------------
+
+	
+	@Override
+	public DocumentModel savePreferences(CoreSession defaultSession, String spaceId, String username, String freq) {
+
+		
+		CoreSession notifSession = SessionFactory.getSession(notifRepository);
+		
+		DocumentModel preferences = getPreferences(notifSession, spaceId, username);
+		
+		if(StringUtils.isNotBlank(freq)) {
+			
+			NotificationFrequency frequency = NotificationFrequency.valueOf(freq);
+			NotificationsHelper.setNextPlanification(preferences, frequency);
+	   		
+			preferences.setPropertyValue(UserPreferencesService.TTCPN_FREQ, freq);
+
+			preferences = notifSession.saveDocument(preferences);
+		}
+
+		return preferences;
+
+	}
+	
+	@Override
+	public void savePlanification(DocumentModel preference) {
+
+		CoreSession notifSession = null;
+		
+		notifSession = CoreInstance.openCoreSession(notifRepository);
+
+		NotificationFrequency frequency = NotificationFrequency.valueOf(
+				preference.getPropertyValue(UserPreferencesService.TTCPN_FREQ).toString());
+		
+		NotificationsHelper.setNextPlanification(preference, frequency);
+   		
+		notifSession.saveDocument(preference);
+
+	}
+	
+	public void subscribe(CoreSession session, DocumentModel currentDocument) {
+		
+		CoreSession notifSession = SessionFactory.getSession(notifRepository);
+
+		if(getStatusInRepo(notifSession, currentDocument) == SubscriptionStatus.can_subscribe) {
 			
 
 			// get workspaceId of the current document
@@ -214,11 +207,65 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 				throw new ClientException("User can not subscribe to this document");
 
 			}
-
-        	CoreSession notificationRepoSession = CoreInstance.openCoreSession(repository);
 			
-			DocumentModel prefDoc = getOrCreatePrefDoc(notificationRepoSession, workspaceId, personUid);
-			String[] paths = (String[]) prefDoc.getPropertyValue("ttcpn:paths");
+			DocumentModel prefDoc = getPreferences(notifSession, workspaceId, personUid);
+			String[] paths = (String[]) prefDoc.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
+			String[] newPaths = null;
+			if(paths != null) {
+				List<String> pathsList = new ArrayList<String>(Arrays.asList(paths));
+				pathsList.add(currentDocument.getPathAsString());
+				newPaths = new String[pathsList.size()];
+				pathsList.toArray(newPaths);
+			}
+			else {
+				newPaths = new String[1];
+				newPaths[0] = currentDocument.getPathAsString();
+			}
+
+
+			prefDoc.setPropertyValue(UserPreferencesService.TTCPN_PATHS, newPaths);
+			
+			notifSession.saveDocument(prefDoc);
+			
+			
+		}
+
+		
+	}	
+	
+
+
+	@Override
+	public void unsubscribe(CoreSession session, DocumentModel currentDocument) {
+		
+		CoreSession notifSession = SessionFactory.getSession(notifRepository);
+
+			
+			if(getStatusInRepo(notifSession, currentDocument) == SubscriptionStatus.can_unsubscribe) {
+				
+			// get workspaceId of the current document
+			String workspaceId = null;
+			DocumentModel workspace = ToutaticeDocumentHelper.getWorkspace(session, currentDocument, true);
+			if(workspace != null) {
+				workspaceId = workspace.getProperty("webc:url").getValue(String.class);
+				
+			}
+			else {
+				throw new ClientException("User can not subscribe to this document");
+			}
+			
+			DocumentModel ldapEntry = getLdapEntry(session.getPrincipal().getName());
+			String personUid = ldapEntry.getProperty("pseudonymizedId").getValue(String.class);
+			
+			if(StringUtils.isBlank(personUid)) {
+				throw new ClientException("User can not subscribe to this document");
+
+			}
+
+        	
+			
+			DocumentModel prefDoc = getPreferences(notifSession, workspaceId, personUid);
+			String[] paths = (String[]) prefDoc.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
 			
 			List<String> pathsList = new ArrayList<String>(Arrays.asList(paths));
 			pathsList.remove(currentDocument.getPathAsString());
@@ -227,102 +274,65 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 				String[] newPaths = new String[pathsList.size()];
 				pathsList.toArray(newPaths);
 				
-				prefDoc.setPropertyValue("ttcpn:paths", newPaths);
+				prefDoc.setPropertyValue(UserPreferencesService.TTCPN_PATHS, newPaths);
 				
-				notificationRepoSession.saveDocument(prefDoc);
+				notifSession.saveDocument(prefDoc);
 				
 			}
 			else {
-				prefDoc.setPropertyValue("ttcpn:paths", null);
-				notificationRepoSession.saveDocument(prefDoc);
+				prefDoc.setPropertyValue(UserPreferencesService.TTCPN_PATHS, null);
+				notifSession.saveDocument(prefDoc);
 			}
 			
-			CoreInstance.closeCoreSession(notificationRepoSession);
 			
 		}
+		
 	}
 	
-	private static class SetUnrestrictedPrefs extends UnrestrictedSessionRunner {
-
-		private final String preferencesPath;
-		private final String username;
-		private final String currentUsername;
-		private final String workspaceId;
+	
+	public SubscriptionStatus getStatus(CoreSession session, DocumentModel currentDocument) {
 		
-		private DocumentModel userNotif;
-		
-
-		protected SetUnrestrictedPrefs(CoreSession session, String preferencesPath, String username, String currentUsername,
-				String workspaceId) {
-			super(session);
-			this.preferencesPath = preferencesPath;
+		CoreSession notifSession = SessionFactory.getSession(notifRepository);
 			
-			this.username = username;
-			this.currentUsername = currentUsername;
-			this.workspaceId = workspaceId;
-			
-		}
+		SubscriptionStatus status = getStatusInRepo(notifSession, currentDocument);
 
-		@Override
-		public void run() throws ClientException {
-			
-	    	
-	    	// === Test if folder pref exists
-	    	DocumentModelList userPrefs = session.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesUtilisateur' AND ecm:name = '"+
-	    			username+"' AND ecm:currentLifeCycleState != 'deleted'");
-	    	
-	    	DocumentModel userPref = null;
-	    	if(userPrefs.size() == 0) {
-	    		userPref = session.createDocumentModel(preferencesPath, username, "PreferencesUtilisateur");
-	    		userPref.setPropertyValue("dc:title", username);
+		return status;
 
-	    		userPref = session.createDocument(userPref);
-	    		
-	    		log.warn("Création des preferences utilisateur pour "+username);
-
-	    		
-	    		ACP acp = session.getACP(userPref.getRef());
-	    		ACL acl = new ACLImpl();
-	    		acl.add(new ACE(currentUsername, "ReadWrite", true));
-				acp.addACL(acl);
-				session.setACP(userPref.getRef(), acp, true);
-				
-	    	}
-	    	else if(userPrefs.size() == 1) {
-	    		
-	    		log.warn("Preferences utilisateur trouvées pour "+username);
-	    		
-	    		userPref = userPrefs.get(0);
-	    	}
-	    	
-	    	
-	    	
-	    	// Test if doc for current space exists
-	    	DocumentModelList userNotifs = session.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND ttcpn:user_id = '"+
-	    			username+"' AND ttcpn:space_id = '"+workspaceId+"' AND ecm:currentLifeCycleState != 'deleted'");
-	    	
-	    	if(userNotifs.size() == 0) {
-	    		userNotif = session.createDocumentModel(userPref.getPathAsString(), workspaceId, "PreferencesNotification");
-	    		userNotif.setPropertyValue("ttcpn:user_id", username);
-	    		userNotif.setPropertyValue("ttcpn:space_id", workspaceId);
-	    		userNotif.setPropertyValue("dc:title", workspaceId);
-	    		userNotif = session.createDocument(userNotif);
-	    		
-	    		log.warn("Création des preferences de notification d'espace "+workspaceId+" pour "+username);
-
-	    	}
-	    	else if(userNotifs.size() == 1) {
-	    		userNotif = userNotifs.get(0);
-	    		
-	    		log.warn("Oreferences de notification d'espace trouvées pour "+workspaceId+" / "+username);
-
-	    	}
-	    	
-		}
-
-		public DocumentModel getUserNotif() {
-			return userNotif;
-		}
 		
 	}
+
+	@Override
+	public void createNotification(NotificationBean notif) {
+	
+		CoreSession notifSession = null;
+
+		notifSession = CoreInstance.openCoreSession(notifRepository);
+		
+		DocumentModel parent = getNotificationFolder(notifSession);
+		long longid = new Date().getTime();
+		
+		DocumentModel notifDoc = notifSession.createDocumentModel(parent.getPathAsString(), Long.toString(longid), "Notification");
+		
+		notifDoc.setPropertyValue("ntf:freq", notif.getFreq().name());
+		Calendar from = notif.getFrom();
+		notifDoc.setPropertyValue("ntf:derniereNotif", from.getTime());
+		notifDoc.setPropertyValue("ntf:espace", notif.getSpaceWebid());
+		
+	    List<Map<String, Object>> complexValuesList = new ArrayList<Map<String, Object>>();
+	    for(NotifiedDocument ndoc : notif.getDocs()) {
+    	    Map<String, Object> complexValue = new HashMap<String, Object>();
+    	    complexValue.put("action", ndoc.getAction().name());
+    	    
+    	    Calendar lastContribution = ndoc.getLastContribution();
+    	    complexValue.put("derniereContribution", lastContribution.getTime());
+    	    complexValue.put("dernierContributeur", ndoc.getLastContributor());
+    	    complexValue.put("webid", ndoc.getWebid());
+    	    complexValuesList.add(complexValue);
+		}
+		notifDoc.setPropertyValue("ntf:docs", (Serializable) complexValuesList);
+
+		notifSession.createDocument(notifDoc);
+
+	}
+
 }

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<component name="org.osivia.platform.portal.notifications.cron">
+
+
+  <extension
+    target="org.nuxeo.ecm.platform.scheduler.core.service.SchedulerRegistryService"
+    point="schedule">
+
+    <schedule id="notificationsCron">
+      <eventId>notificationsCronEvent</eventId>
+      <!-- every hour -->
+      <cronExpression>0 */1 * * * ?</cronExpression>
+    </schedule>
+   </extension>
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+    
+    <listener name="notificationsCronListener" async="false"
+      class="org.osivia.platform.portal.notifications.batch.NotificationsCronListener">
+      <event>notificationsCronEvent</event>
+    </listener>
+  </extension>
+  
+	<extension point="queues"
+		target="org.nuxeo.ecm.core.work.service">
+		<queue id="notification-hourly-queue">
+			<name>notification-hourly-queue</name>
+			<maxThreads>1</maxThreads>
+			<category>NOTIFICATION_HOURLY</category>
+		</queue>
+		<queue id="notification-daily-queue">
+			<name>notification-daily-queue</name>
+			<maxThreads>1</maxThreads>
+			<category>NOTIFICATION_DAILY</category>
+		</queue>
+		<queue id="notification-weekly-queue">
+			<name>notification-weekly-queue</name>
+			<maxThreads>1</maxThreads>
+			<category>NOTIFICATION_WEEKLY</category>
+		</queue>
+	</extension>
+
+</component>
