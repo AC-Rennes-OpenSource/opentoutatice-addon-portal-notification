@@ -9,6 +9,11 @@ import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.osivia.platform.portal.notifications.service.UserPreferencesService;
 
+/**
+ * 
+ * @author Loïc Billon
+ *
+ */
 public class NotificationsHelper {
 
 	private static final Log log = LogFactory.getLog("fr.toutatice.notifications");

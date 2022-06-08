@@ -1,5 +1,10 @@
 package org.osivia.platform.portal.notifications.batch;
 
+/**
+ * 
+ * @author Loïc Billon
+ *
+ */
 public enum NotificationFrequency {
 	
 	DAILY,

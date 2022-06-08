@@ -97,6 +97,14 @@
 			autoSubscribed="false" template="portal_comment" label="notifications.name.CommentAdded">
 			<event name="commentAdded" />
 		</notification>
+		
+		
+
+	    <notification autoSubscribed="true" availableIn="all" channel="email" enabled="true" 
+	      label="label.nuxeo.notifications.email.document" name="Periodic reporting" subject="${mailSubject}" 
+	      template="periodicEmailSend">
+	      <event name="periodicEmailSend"/>
+	    </notification>
 
 	</extension>
 
@@ -117,6 +125,9 @@
 		<template name="portal_comment" src="templates/portal_comment_fr.ftl" />
 		<template name="portal_publish_subject" src="templates/portal_publish_subject_fr.ftl" />
 		<template name="portal_publish" src="templates/portal_publish_fr.ftl" />
+
+		<template name="periodicEmailSend" src="templates/periodicEmailSend.ftl" />
+
 
 	</extension>
 

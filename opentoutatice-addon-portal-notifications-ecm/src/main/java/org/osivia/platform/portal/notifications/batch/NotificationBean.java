@@ -13,22 +13,11 @@ public class NotificationBean {
 	
 	private String spaceWebid;
 	
-	private String spaceTitle;
-
 	private NotificationFrequency freq;
 	
 	private Calendar from;
 	
 	public List<NotifiedDocument> docs;
-
-	
-	public String getSpaceTitle() {
-		return spaceTitle;
-	}
-
-	public void setSpaceTitle(String spaceTitle) {
-		this.spaceTitle = spaceTitle;
-	}
 
 	public String getSpaceWebid() {
 		return spaceWebid;

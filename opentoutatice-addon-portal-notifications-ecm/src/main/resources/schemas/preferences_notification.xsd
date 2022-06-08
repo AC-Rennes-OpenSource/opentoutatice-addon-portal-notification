@@ -9,7 +9,7 @@
   <xs:element name="utilisateur" type="xs:string"/>
   <xs:element name="espace" type="xs:string"/>
   <xs:element name="freq" type="xs:string"/>
-  <xs:element name="canal" type="xs:string"/>
+  <xs:element name="diffusion" type="nxs:stringList"/>
   <xs:element name="paths" type="nxs:stringList"/>
   <xs:element name="derniereNotif" type="xs:date"/>
   <xs:element name="prochaineNotif" type="xs:date"/>

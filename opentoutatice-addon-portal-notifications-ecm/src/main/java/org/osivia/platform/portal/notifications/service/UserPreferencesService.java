@@ -18,7 +18,9 @@ public interface UserPreferencesService {
 	public static final String TTCPN_FREQ = "ttcpn:freq";
 	public static final String TTCPN_SPACEID = "ttcpn:espace";
 	public static final String TTCPN_USERID = "ttcpn:utilisateur";
-	public static final String TTCPN_PATHS = "ttcpn:paths";;
+	public static final String TTCPN_PATHS = "ttcpn:paths";
+	public static final String TTCPN_CHANNEL = "ttcpn:canal";
+	public static final String TTCPN_CAST = "ttcpn:diffusion";;
 	
 	/**
 	 * Subscribe to notifications on a document
@@ -62,6 +64,6 @@ public interface UserPreferencesService {
 	 * Produce a notificaiton document
 	 * @param notif
 	 */
-	void createNotification(NotificationBean notif);
+	DocumentModel createNotification(NotificationBean notif);
 
 }

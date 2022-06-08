@@ -50,7 +50,7 @@ public class OttcNotificationEventListener extends NotificationEventListener {
     protected void sendNotificationSignalForUser(Notification notification, String subscriptor, Event event, DocumentEventContext ctx) throws ClientException {
         /* We don't apply rules for (automatic) Email notification. */
         // FIXME: think about autosubscribed notifications?
-        if (DocumentEventTypes.EMAIL_DOCUMENT_SEND.equals(event.getName())) {
+        if ((DocumentEventTypes.EMAIL_DOCUMENT_SEND.equals(event.getName())) || "periodicEmailSend".equals(event.getName())) {
             super.sendNotificationSignalForUser(notification, subscriptor, event, ctx);
         } else if (checkRulesForSubscriptor(notification, subscriptor, event, ctx)) {
             super.sendNotificationSignalForUser(notification, subscriptor, event, ctx);

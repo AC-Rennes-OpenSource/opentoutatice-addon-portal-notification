@@ -13,6 +13,11 @@ import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.impl.ACLImpl;
 import org.nuxeo.runtime.api.Framework;
 
+/**
+ * 
+ * @author Loïc Billon
+ *
+ */
 public class UnrestritctedPreferencesCreator extends UnrestrictedSessionRunner {
 
     protected static final Log log = LogFactory.getLog("fr.toutatice.notifications");

@@ -302,7 +302,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 	}
 
 	@Override
-	public void createNotification(NotificationBean notif) {
+	public DocumentModel createNotification(NotificationBean notif) {
 	
 		CoreSession notifSession = null;
 
@@ -331,7 +331,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 		}
 		notifDoc.setPropertyValue("ntf:docs", (Serializable) complexValuesList);
 
-		notifSession.createDocument(notifDoc);
+		return notifSession.createDocument(notifDoc);
 
 	}
 
