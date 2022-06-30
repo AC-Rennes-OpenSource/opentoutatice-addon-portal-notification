@@ -40,8 +40,8 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 
 
 	public UserPreferencesServiceImpl() {
-		
-    	notifRepository = Framework.getProperty("ottc.notifications.repository", "notificationRepo");
+
+    	notifRepository = Framework.getProperty("opentoutatice.notifications.repository");
 
 	}
 	

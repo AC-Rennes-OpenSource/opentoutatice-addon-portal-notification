@@ -167,9 +167,7 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
 
     	
         if(workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
-        	
-        	//CoreSession notificationRepoSession = CoreInstance.openCoreSession(repository);
-        	
+        	       	
         	UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
         	return userPrefService.getStatus(coreSession, currentDocument);
         	

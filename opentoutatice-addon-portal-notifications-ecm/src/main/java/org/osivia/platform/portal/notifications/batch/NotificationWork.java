@@ -172,18 +172,19 @@ public class NotificationWork extends AbstractWork {
 					ndoc.setLastContributor(doc.getPropertyValue("dc:lastContributor").toString());
 
 					if (doc.getPropertyValue("dc:modified").equals(doc.getPropertyValue("dc:created"))) {
-							ndoc.setAction(NotifiedAction.CREATE);
-						}
-						ndocs.add(ndoc);
+						ndoc.setAction(NotifiedAction.CREATE);
 					}
-					notif.setDocs(ndocs);
+					ndocs.add(ndoc);
+				}
 
-					DocumentModel notificationDocument = ups.createNotification(notif);
+				notif.setDocs(ndocs);
+
+				DocumentModel notificationDocument = ups.createNotification(notif);
 					
-					Map<String, Serializable> prepareEmail = prepareEmail(notif, userSession);
-  
-			        
-			        CoreSession userNotifSession = CoreInstance.openCoreSession("notificationRepo", principal);
+				Map<String, Serializable> prepareEmail = prepareEmail(notif, userSession);
+  		        
+				String repo = Framework.getProperty("opentoutatice.notifications.repository");
+		        CoreSession userNotifSession = CoreInstance.openCoreSession(repo, principal);
 				DocumentEventContext ctx = new DocumentEventContext(userNotifSession, principal, notificationDocument);
 									
 				ctx.setProperties(prepareEmail);

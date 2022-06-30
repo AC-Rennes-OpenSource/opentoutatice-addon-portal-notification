@@ -29,7 +29,7 @@ public class UnrestritctedPreferencesCreator extends UnrestrictedSessionRunner {
 	private DocumentModel pref;
 
 	
-	private final String domainPath = Framework.getProperty("ottc.notifs.path", "/preferences/");
+	private final String domainPath = Framework.getProperty("opentoutatice.notifications.path", "/preferences/");
 
 	protected UnrestritctedPreferencesCreator(CoreSession session, String username, String currentUsername,
 			String workspaceId) {
