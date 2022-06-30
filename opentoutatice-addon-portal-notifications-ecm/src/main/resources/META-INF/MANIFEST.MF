@@ -14,5 +14,6 @@ Nuxeo-Component: OSGI-INF/extensions/listeners-contrib.xml,
  OSGI-INF/extensions/notifs-service-contrib.xml,
  OSGI-INF/extensions/preferences-service-contrib.xml,
  OSGI-INF/extensions/scheduler-contrib.xml,
+ OSGI-INF/extensions/sender-service-contrib.xml,
  
  

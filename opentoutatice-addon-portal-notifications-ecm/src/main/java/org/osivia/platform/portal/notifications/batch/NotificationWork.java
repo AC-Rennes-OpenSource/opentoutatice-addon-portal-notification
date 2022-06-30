@@ -14,16 +14,18 @@ import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.event.DocumentEventCategories;
 import org.nuxeo.ecm.core.event.Event;
-import org.nuxeo.ecm.core.event.EventProducer;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.work.AbstractWork;
 import org.nuxeo.ecm.directory.api.DirectoryService;
 import org.nuxeo.ecm.directory.ldap.LDAPDirectory;
 import org.nuxeo.ecm.directory.ldap.LDAPSession;
 import org.nuxeo.ecm.platform.ec.notification.NotificationConstants;
+import org.nuxeo.ecm.platform.notification.api.Notification;
+import org.nuxeo.ecm.platform.notification.api.NotificationManager;
 import org.nuxeo.ecm.platform.usermanager.UserManager;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.nuxeo.elasticsearch.query.NxQueryBuilder;
@@ -120,16 +122,29 @@ public class NotificationWork extends AbstractWork {
 
 			sbNxql.append(")");
 
-			
-			queryBuilder.nxql(sbNxql.toString());
-			ElasticSearchService es = Framework.getService(ElasticSearchService.class);
-			DocumentModelList documents = es.query(queryBuilder);
+			DocumentModelList documents = null;
+					
+			if(paths.length > 0) {
+				queryBuilder.nxql(sbNxql.toString());
+				ElasticSearchService es = Framework.getService(ElasticSearchService.class);
+				
+				if (log.isDebugEnabled()) {
+					log.debug(sbNxql.toString());
+				}
+				
+				documents = es.query(queryBuilder);
 
-			if (log.isDebugEnabled()) {
-				log.debug(sbNxql.toString());
 			}
-						
-			if (documents.isEmpty()) {
+			
+			if (documents == null) {
+				if (log.isDebugEnabled()) {
+
+					String espace = preference.getPropertyValue(UserPreferencesService.TTCPN_SPACEID).toString();
+
+					log.debug("Aucun document n'est suivi pour " + login + " sur " + espace);
+				}
+			}
+			else if (documents.isEmpty()) {
 				if (log.isDebugEnabled()) {
 
 					String espace = preference.getPropertyValue(UserPreferencesService.TTCPN_SPACEID).toString();
@@ -137,29 +152,26 @@ public class NotificationWork extends AbstractWork {
 					log.debug("Rien à envoyer pour " + login + " sur " + espace);
 				}
 			} else {
+				String espace = preference.getPropertyValue(UserPreferencesService.TTCPN_SPACEID).toString();
 
-				if (log.isDebugEnabled()) {
+				log.debug("Envoi notification à " + login + " sur " + espace + ", " + documents.size()
+						+ " nouveautés.");
 
-					String espace = preference.getPropertyValue(UserPreferencesService.TTCPN_SPACEID).toString();
+				NotificationBean notif = new NotificationBean();
+				notif.setSpaceWebid(espace);
+				notif.setFrom(c);
+				notif.setFreq(NotificationFrequency
+						.valueOf(preference.getPropertyValue(UserPreferencesService.TTCPN_FREQ).toString()));
 
-					log.debug("Envoi notification à " + login + " sur " + espace + ", " + documents.size()
-							+ " nouveautés.");
+				List<NotifiedDocument> ndocs = new ArrayList<NotifiedDocument>();
+				for (DocumentModel doc : documents) {
+					NotifiedDocument ndoc = new NotifiedDocument();
 
-					NotificationBean notif = new NotificationBean();
-					notif.setSpaceWebid(espace);
-					notif.setFrom(c);
-					notif.setFreq(NotificationFrequency
-							.valueOf(preference.getPropertyValue(UserPreferencesService.TTCPN_FREQ).toString()));
+					ndoc.setWebid(doc.getPropertyValue("ttc:webid").toString());
+					ndoc.setLastContribution((Calendar) doc.getPropertyValue("dc:modified"));
+					ndoc.setLastContributor(doc.getPropertyValue("dc:lastContributor").toString());
 
-					List<NotifiedDocument> ndocs = new ArrayList<NotifiedDocument>();
-					for (DocumentModel doc : documents) {
-						NotifiedDocument ndoc = new NotifiedDocument();
-
-						ndoc.setWebid(doc.getPropertyValue("ttc:webid").toString());
-						ndoc.setLastContribution((Calendar) doc.getPropertyValue("dc:modified"));
-						ndoc.setLastContributor(doc.getPropertyValue("dc:lastContributor").toString());
-
-						if (doc.getPropertyValue("dc:modified").equals(doc.getPropertyValue("dc:created"))) {
+					if (doc.getPropertyValue("dc:modified").equals(doc.getPropertyValue("dc:created"))) {
 							ndoc.setAction(NotifiedAction.CREATE);
 						}
 						ndocs.add(ndoc);
@@ -172,19 +184,19 @@ public class NotificationWork extends AbstractWork {
   
 			        
 			        CoreSession userNotifSession = CoreInstance.openCoreSession("notificationRepo", principal);
-					DocumentEventContext ctx = new DocumentEventContext(userNotifSession, principal, notificationDocument);
-					ctx.setProperties(prepareEmail);
-					Event event = ctx.newEvent("periodicEmailSend");
+				DocumentEventContext ctx = new DocumentEventContext(userNotifSession, principal, notificationDocument);
+									
+				ctx.setProperties(prepareEmail);
+				Event event = ctx.newEvent("periodicEmailSend");
 
-					EventProducer evtProducer = null;
-					try {
-						evtProducer = Framework.getService(EventProducer.class);
-						evtProducer.fireEvent(event);
+				try {
 
-					} catch (Exception e) {
-						log.error("Can not get EventProducer : email won't be sent", e);
-						return;
-					}
+					DirectNotificationSender sender = Framework.getService(DirectNotificationSender.class);
+					sender.sendNotification(event, ctx);
+
+				} catch (Exception e) {
+					log.error("Can not get EventProducer : email won't be sent", e);
+					return;
 				}
 			}
 		}
@@ -209,6 +221,19 @@ public class NotificationWork extends AbstractWork {
 		String mailSubject = "Activité sur votre espace "+workspace.getTitle();
 		
         // options for confirmation email
+		
+		NotificationManager service2 = Framework.getService(NotificationManager.class);
+		
+		String template = Framework.getProperty(DirectNotificationSender.PROP_TEMPLATE);
+		
+		Notification notification = service2.getNotificationByName(template);
+		
+		if(notification == null) {
+			throw new NuxeoException("Template non trouvé");
+		}
+		
+		options.put(NotificationConstants.NOTIFICATION_KEY, notification);
+        options.put(NotificationConstants.DESTINATION_KEY, new String(userSession.getPrincipal().getName()));
         options.put(NotificationConstants.RECIPIENTS_KEY, new String[] { userSession.getPrincipal().getName() });
         options.put("mailSubject", mailSubject);
         

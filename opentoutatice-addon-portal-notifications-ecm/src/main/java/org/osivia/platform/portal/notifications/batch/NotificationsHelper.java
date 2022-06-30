@@ -7,6 +7,7 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.runtime.api.Framework;
 import org.osivia.platform.portal.notifications.service.UserPreferencesService;
 
 /**
@@ -15,6 +16,14 @@ import org.osivia.platform.portal.notifications.service.UserPreferencesService;
  *
  */
 public class NotificationsHelper {
+	
+	public final static String PROP_HOURLY_DELAY_IN_MIN = Framework.getProperty("org.opentoutatice.notifications.hourly.delayInMin", "60");
+	
+	public final static String PROP_DAILY_HOUR = Framework.getProperty("org.opentoutatice.notifications.daily.hour", "17");
+	
+	public final static String PROP_WEEKLY_HOUR = Framework.getProperty("org.opentoutatice.notifications.weekly.hour", "10");
+	public final static String PROP_WEEKLY_DAY = Framework.getProperty("org.opentoutatice.notifications.weekly.day", "7");
+	
 
 	private static final Log log = LogFactory.getLog("fr.toutatice.notifications");
 	
@@ -38,21 +47,19 @@ public class NotificationsHelper {
     		return;
 		}
 		if(frequency == NotificationFrequency.HOURLY) {
-			// Fréquence horaire => H+1
-//    		c.add(Calendar.HOUR_OF_DAY, 1);
 			
-			c.add(Calendar.MINUTE, 3);
+			c.add(Calendar.MINUTE, Integer.parseInt(PROP_HOURLY_DELAY_IN_MIN));
 		}
 		else if(frequency == NotificationFrequency.DAILY) {
 			// Fréquence journalière => J+1,17h
-    		c.set(Calendar.HOUR_OF_DAY, 17);
+    		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(PROP_DAILY_HOUR));
     		c.add(Calendar.DAY_OF_YEAR, 1);
     		
 		}
 		else if(frequency == NotificationFrequency.WEEKLY) {
 			// Fréquence hedbo => prochain samedi, 10h
-    		c.set(Calendar.HOUR_OF_DAY, 10);
-    		c.set(Calendar.DAY_OF_WEEK, 7);
+    		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(PROP_WEEKLY_HOUR));
+    		c.set(Calendar.DAY_OF_WEEK, Integer.parseInt(PROP_WEEKLY_DAY));
     		
 		}
 		preference.setPropertyValue(UserPreferencesService.TTCPN_LASTDATE, new Date());
