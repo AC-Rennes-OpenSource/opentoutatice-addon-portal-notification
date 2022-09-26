@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.osivia.platform.portal.notifications.infos.provider" version="1.0">
+
+	<require>fr.toutatice.ecm.platform.core.services.infos.provider</require>
+	
+	<extension target="fr.toutatice.ecm.platform.core.services.infos.provider"
+    	point="extended_fetch_infos">
+    
+    	<fetchInfos name="notifsInfosProvider" class="org.osivia.platform.portal.notifications.service.DocumentNotificationInfosProviderImpl" />
+    	
+    </extension>
+</component>

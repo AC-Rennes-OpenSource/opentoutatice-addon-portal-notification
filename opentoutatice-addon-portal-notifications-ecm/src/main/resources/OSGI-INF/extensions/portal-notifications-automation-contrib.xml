@@ -7,7 +7,11 @@
 		point="operations">
 
 		<operation class="org.osivia.platform.portal.notifications.automation.HandleNotification" />
-		
+		<operation class="org.osivia.platform.portal.notifications.automation.SavePreferences" />
+	    <operation class="org.osivia.platform.portal.notifications.automation.AllNotificationsSubscribe" />
+	    <operation class="org.osivia.platform.portal.notifications.automation.AllNotificationsUnsubscribe" />
+	    <operation class="org.osivia.platform.portal.notifications.automation.GetUserSubscriptions" />
+	    
 	</extension>
 
 </component>

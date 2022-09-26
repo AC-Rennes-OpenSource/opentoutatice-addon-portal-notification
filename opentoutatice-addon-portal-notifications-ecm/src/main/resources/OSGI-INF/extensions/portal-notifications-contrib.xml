@@ -97,7 +97,7 @@
 			autoSubscribed="false" template="portal_comment" label="notifications.name.CommentAdded">
 			<event name="commentAdded" />
 		</notification>
-
+		
 	</extension>
 
 	<extension
@@ -117,6 +117,8 @@
 		<template name="portal_comment" src="templates/portal_comment_fr.ftl" />
 		<template name="portal_publish_subject" src="templates/portal_publish_subject_fr.ftl" />
 		<template name="portal_publish" src="templates/portal_publish_fr.ftl" />
+
+
 
 	</extension>
 
