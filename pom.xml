@@ -8,11 +8,11 @@
 	<packaging>pom</packaging>
 	<name>Portal notifications plugin - parent</name>
 	<description>Addon to custom Nuxeo notifications to Portal</description>
-	<version>RAB-4.7.37-SNAPSHOT</version>
+	<version>RAB-4.7.37</version>
 
 	<properties>
 		<nuxeo.version>RAB-6.1.5</nuxeo.version>
-		<opentoutatice.version>RAB-4.7.44</opentoutatice.version>
+		<opentoutatice.version>RAB-4.7.45</opentoutatice.version>
 	</properties>
 
 	<modules>
