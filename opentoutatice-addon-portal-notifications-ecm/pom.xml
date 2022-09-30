@@ -6,11 +6,8 @@
 	<parent>
 		<groupId>opentoutatice-ecm.portal-notifications</groupId>
 		<artifactId>opentoutatice-addon-portal-notifications-parent</artifactId>
-		<version>RAB-4.7.37</version>
+		<version>RAB-4.7.38-SNAPSHOT</version>
 	</parent>
-
-	<properties>
-	</properties>
 
 	<artifactId>opentoutatice-addon-portal-notifications-ecm</artifactId>
 	<packaging>jar</packaging>
