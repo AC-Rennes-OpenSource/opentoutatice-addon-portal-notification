@@ -1,5 +1,6 @@
 package org.osivia.platform.portal.notifications.batch;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -69,13 +70,16 @@ public class NotificationsCronJob  extends UnrestrictedSessionRunner {
 		
 		// Examen de la fréquence souhaitée
 		for(DocumentModel preference : preferences) {
-						
-			NotificationFrequency frequency = NotificationFrequency.valueOf(preference.getPropertyValue(UserPreferencesService.TTCPN_FREQ).toString());
 
-			NotificationsHelper.setNextPlanification(preference, frequency);
-   		
-    		session.saveDocument(preference);
-			
+			Serializable freq = preference.getPropertyValue(UserPreferencesService.TTCPN_FREQ);
+			if(freq != null) {
+				NotificationFrequency frequency = NotificationFrequency.valueOf(freq.toString());
+
+				NotificationsHelper.setNextPlanification(preference, frequency);
+
+				session.saveDocument(preference);
+			}
+
 		}
 		
 		
