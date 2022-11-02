@@ -271,7 +271,7 @@ public class NotificationWork extends AbstractWork {
         	sb.append("<p>");
         	
         	// ==== auteur
-        	DocumentModel entry = ldapSession.getEntryFromSource(notified.getLastContributor(),false);
+        	DocumentModel entry = ldapSession.getEntry(notified.getLastContributor(),false);
         	Serializable firstName = entry.getPropertyValue("firstName");
 			Serializable lastName = entry.getPropertyValue("lastName");
 			

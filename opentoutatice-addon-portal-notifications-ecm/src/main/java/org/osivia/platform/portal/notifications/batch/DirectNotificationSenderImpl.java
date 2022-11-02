@@ -23,6 +23,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.naming.InitialContext;
 import javax.security.auth.login.LoginContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,7 @@ import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.platform.ec.notification.NotificationConstants;
 import org.nuxeo.ecm.platform.ec.notification.NotificationImpl;
+import org.nuxeo.ecm.platform.ec.notification.email.EmailHelper;
 import org.nuxeo.ecm.platform.ec.notification.email.NotificationsRenderingEngine;
 import org.nuxeo.ecm.platform.ec.notification.service.NotificationService;
 import org.nuxeo.ecm.platform.ec.notification.service.NotificationServiceHelper;
@@ -56,8 +58,10 @@ public class DirectNotificationSenderImpl implements DirectNotificationSender  {
     private final Configuration stringCfg = new Configuration();
     
 	
-    private NotificationService notificationService = NotificationServiceHelper.getNotificationService();	
-    
+    private NotificationService notificationService = NotificationServiceHelper.getNotificationService();
+
+
+    protected static boolean javaMailNotAvailable = false;
     
     public void sendNotification(Event event, DocumentEventContext ctx)
             throws ClientException {
@@ -145,10 +149,11 @@ public class DirectNotificationSenderImpl implements DirectNotificationSender  {
      */
     protected void sendmail(Map<String, Object> mail) throws Exception {
 
+        Session session = getSession();
+        if (javaMailNotAvailable || session == null) {
+            throw new ClientException ("Not sending email since JavaMail is not configured");
+        }
 
-    	Properties prop = Framework.getProperties();
-    	Session session = Session.getInstance(prop);
-    	
         // Construct a MimeMessage
         MimeMessage msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(session.getProperty("mail.from")));
@@ -243,5 +248,24 @@ public class DirectNotificationSenderImpl implements DirectNotificationSender  {
         // Send the message.
         msg.setContent(multipart);
         Transport.send(msg);
+    }
+
+    private static Session getSession() {
+        Session session = null;
+        if (javaMailNotAvailable) {
+            return null;
+        }
+        // First, try to get the session from JNDI, as would be done under J2EE.
+        try {
+            NotificationService service = (NotificationService) Framework.getRuntime().getComponent(
+                    NotificationService.NAME);
+            InitialContext ic = new InitialContext();
+            session = (Session) ic.lookup(service.getMailSessionJndiName());
+        } catch (Exception ex) {
+            log.warn("Unable to find Java mail API", ex);
+            javaMailNotAvailable = true;
+        }
+
+        return session;
     }
 }

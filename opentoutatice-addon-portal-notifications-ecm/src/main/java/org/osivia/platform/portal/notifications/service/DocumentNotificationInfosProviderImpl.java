@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,11 +64,17 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
 
 	private String workspacepath;
 
+    /**
+     * Switch in the new scheduled mode with the perferences service.
+     */
+    private Boolean scheduledNotifications;
 
-    
     public DocumentNotificationInfosProviderImpl() {
     	workspacepath = Framework.getProperty("ottc.collab.workspacepath");
-   	
+
+        // Switch in the new scheduled mode with the perferences service.
+        String scheduled = Framework.getProperty("ottc.notifications.scheduled");
+        scheduledNotifications = BooleanUtils.toBoolean(scheduled);
     }
     
 
@@ -89,7 +96,7 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
     public void subscribe(CoreSession coreSession, DocumentModel currentDocument) {
 
     	
-        if(workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
+        if(scheduledNotifications && workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
         	
         	UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
 
@@ -116,7 +123,7 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
     @Override
     public void unsubscribe(CoreSession coreSession, DocumentModel currentDocument) throws ClientException, ClassNotFoundException {
 
-        if(workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
+        if(scheduledNotifications && workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
         	
         	UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
 
@@ -166,7 +173,7 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
     public SubscriptionStatus getStatus(CoreSession coreSession, DocumentModel currentDocument, boolean fetchCall) throws ClientException {
 
     	
-        if(workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
+        if(scheduledNotifications && workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
         	       	
         	UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
         	return userPrefService.getStatus(coreSession, currentDocument);

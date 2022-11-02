@@ -56,7 +56,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 		DocumentModel entry = null;
 		if(ldapSession != null) {
 			try {
-				entry = ldapSession.getEntryFromSource(login, false);
+				entry = ldapSession.getEntry(login, false);
 			}
 			catch(ClientException e) {
 				ldapSession = null;
@@ -70,7 +70,7 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 			
 			ldapSession = (LDAPSession) directory.getSession();
 			
-			entry = ldapSession.getEntryFromSource(login,false);
+			entry = ldapSession.getEntry(login,false);
 
 		}
 		
