@@ -214,9 +214,7 @@ public class NotificationWork extends AbstractWork {
 		ElasticSearchService es = Framework.getService(ElasticSearchService.class);
 		DocumentModelList documents = es.query(queryBuilder);
 		DocumentModel workspace = documents.get(0);
-		
-		
-		// TODO Auto-generated method stub
+
 		Map<String, Serializable> options = new HashMap<String, Serializable>();
 
 		String mailSubject = "Activité sur votre espace "+workspace.getTitle();
@@ -239,18 +237,23 @@ public class NotificationWork extends AbstractWork {
         options.put("mailSubject", mailSubject);
         
         String lastDateStr;
+		String freqStr;
         
         if(notif.getFreq().equals(NotificationFrequency.DAILY)) {
         	lastDateStr = "depuis hier.";
+			freqStr = "quotidien";
         }
         else if(notif.getFreq().equals(NotificationFrequency.WEEKLY)) {
         	lastDateStr = "depuis la semaine dernière.";
+			freqStr = "hebdomadaire";
         }
         else {
-        	lastDateStr = "récemment.";
+        	lastDateStr = "récemment";
+			freqStr = "toutes les heures";
         }
         
         options.put("lastDateStr", lastDateStr);
+		options.put("freqStr", freqStr);
         
         DirectoryService service = Framework.getService(DirectoryService.class);
 		LDAPDirectory directory = (LDAPDirectory) service.getDirectory("userLdapDirectory");

@@ -240,6 +240,7 @@ public class DirectNotificationSenderImpl implements DirectNotificationSender  {
 				DataSource source = new FileDataSource(f);
 				attechedImages.setDataHandler(new DataHandler(source));
 				attechedImages.setHeader("Content-ID", "<logo>");
+                attechedImages.setDisposition(MimeBodyPart.INLINE);
 				multipart.addBodyPart(attechedImages);
 			}
 
