@@ -11,7 +11,8 @@
 	    <operation class="org.osivia.platform.portal.notifications.automation.AllNotificationsSubscribe" />
 	    <operation class="org.osivia.platform.portal.notifications.automation.AllNotificationsUnsubscribe" />
 	    <operation class="org.osivia.platform.portal.notifications.automation.GetUserSubscriptions" />
-	    
+		<operation class="org.osivia.platform.portal.notifications.automation.SpaceNotificationsUnsubscribe" />
+
 	</extension>
 
 </component>

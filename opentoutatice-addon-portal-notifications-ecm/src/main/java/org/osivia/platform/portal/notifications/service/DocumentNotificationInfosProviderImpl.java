@@ -26,14 +26,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreInstance;
-import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.DocumentSecurityException;
-import org.nuxeo.ecm.core.api.IdRef;
-import org.nuxeo.ecm.core.api.NuxeoPrincipal;
+import org.nuxeo.ecm.core.api.*;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.impl.ListProperty;
@@ -99,24 +92,18 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
         if(scheduledNotifications && workspacepath != null && currentDocument.getPathAsString().startsWith(workspacepath)) {
         	
         	UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
-
         	userPrefService.subscribe(coreSession, currentDocument);
         	
         }
         else if (getStatus(coreSession, currentDocument, false) == SubscriptionStatus.can_subscribe) {
-        	
 
-	            NotificationManager notificationManager = Framework.getService(NotificationManager.class);
-	
-	            NuxeoPrincipal principal = (NuxeoPrincipal) coreSession.getPrincipal();
-	
-	            notificationManager.addSubscriptions(NuxeoPrincipal.PREFIX + principal.getName(), currentDocument, false, principal);
-            
-            
+            NotificationManager notificationManager = Framework.getService(NotificationManager.class);
+            NuxeoPrincipal principal = (NuxeoPrincipal) coreSession.getPrincipal();
+            notificationManager.addSubscriptions(NuxeoPrincipal.PREFIX + principal.getName(), currentDocument, false, principal);
+
         } else {
             throw new ClientException("User can not subscribe to this document");
         }
-
 
     }
 
@@ -306,6 +293,7 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
     @Override
     public DocumentModelList getUserSubscriptions(CoreSession coreSession) {
 
+        // Get old workspaces and other spaces subscriptions
         DocumentModelList documentsSubscribed = new DocumentModelListImpl();
 
         PlacefulService serviceBean = NotificationServiceHelper.getPlacefulServiceBean();
@@ -325,13 +313,33 @@ public class DocumentNotificationInfosProviderImpl implements DocumentNotificati
             try {
 
                 DocumentModel subscribedDoc = coreSession.getDocument(new IdRef(us.getDocId()));
-                documentsSubscribed.add(subscribedDoc);
+
+                // ignore subscriptions in workspaces
+                if(!scheduledNotifications || !(subscribedDoc.getPathAsString().startsWith(workspacepath))) {
+                    documentsSubscribed.add(subscribedDoc);
+                }
 
             } catch (ClientException ce) {
                 repareUserSubscription(coreSession, us, ce);
             }
 
         }
+        if(scheduledNotifications) {
+            // Get collab workspace subscriptions
+            UserPreferencesService userPrefService = Framework.getService(UserPreferencesService.class);
+            List<String> paths = userPrefService.getUserSubscriptionPaths(coreSession);
+            for (String path : paths) {
+                try {
+
+                    DocumentModel subscribedDoc = coreSession.getDocument(new PathRef(path));
+                    documentsSubscribed.add(subscribedDoc);
+
+                } catch (ClientException ce) {
+                    // do nothing
+                }
+            }
+        }
+
 
         return documentsSubscribed;
     }

@@ -12,14 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreInstance;
-import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.directory.api.DirectoryService;
-import org.nuxeo.ecm.directory.ldap.LDAPDirectory;
-import org.nuxeo.ecm.directory.ldap.LDAPSession;
+import org.nuxeo.ecm.core.api.*;
 import org.nuxeo.ecm.webengine.jaxrs.session.SessionFactory;
 import org.nuxeo.runtime.api.Framework;
 import org.osivia.platform.portal.notifications.batch.NotificationBean;
@@ -33,8 +26,6 @@ import fr.toutatice.ecm.platform.core.helper.ToutaticeDocumentHelper;
 public class UserPreferencesServiceImpl implements UserPreferencesService {
 	
     protected static final Log log = LogFactory.getLog("fr.toutatice.notifications");
-    
-	private LDAPSession ldapSession;
 
 	private String notifRepository;
 
@@ -44,40 +35,6 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
     	notifRepository = Framework.getProperty("opentoutatice.notifications.repository");
 
 	}
-	
-	/**
-	 * This method get a fresh user from ldap, recycling a dedicated connexion to ldap.
-	 * If ldap client is unbinded, try to create a new one.
-	 * 
-	 * @param login str
-	 * @return document ldap entry
-	 */
-	private DocumentModel getLdapEntry(String login) {
-		DocumentModel entry = null;
-		if(ldapSession != null) {
-			try {
-				entry = ldapSession.getEntry(login, false);
-			}
-			catch(ClientException e) {
-				ldapSession = null;
-			}
-		}
-		
-		if(ldapSession == null) {
-			
-			DirectoryService service = Framework.getService(DirectoryService.class);
-			LDAPDirectory directory = (LDAPDirectory) service.getDirectory("userLdapDirectory");
-			
-			ldapSession = (LDAPSession) directory.getSession();
-			
-			entry = ldapSession.getEntry(login,false);
-
-		}
-		
-		return entry;
-	}
-	
-
 
 	protected SubscriptionStatus getStatusInRepo(CoreSession notifSession, DocumentModel currentDocument) {
 		
@@ -187,7 +144,6 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 		CoreSession notifSession = SessionFactory.getSession(notifRepository);
 
 		if(getStatusInRepo(notifSession, currentDocument) == SubscriptionStatus.can_subscribe) {
-			
 
 			// get workspaceId of the current document
 			String workspaceId = null;
@@ -199,15 +155,10 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 			else {
 				throw new ClientException("User can not subscribe to this document");
 			}
-			
-			DocumentModel ldapEntry = getLdapEntry(session.getPrincipal().getName());
-			String personUid = ldapEntry.getProperty("pseudonymizedId").getValue(String.class);
-			
-			if(StringUtils.isBlank(personUid)) {
-				throw new ClientException("User can not subscribe to this document");
 
-			}
-			
+			NuxeoPrincipal principal = (NuxeoPrincipal) notifSession.getPrincipal();
+			String personUid = principal.getModel().getPropertyValue("pseudonymizedId").toString();
+
 			DocumentModel prefDoc = getPreferences(notifSession, workspaceId, personUid);
 			String[] paths = (String[]) prefDoc.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
 			String[] newPaths = null;
@@ -253,17 +204,15 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 			else {
 				throw new ClientException("User can not subscribe to this document");
 			}
-			
-			DocumentModel ldapEntry = getLdapEntry(session.getPrincipal().getName());
-			String personUid = ldapEntry.getProperty("pseudonymizedId").getValue(String.class);
+
+			NuxeoPrincipal principal = (NuxeoPrincipal) notifSession.getPrincipal();
+			String personUid = principal.getModel().getPropertyValue("pseudonymizedId").toString();
 			
 			if(StringUtils.isBlank(personUid)) {
 				throw new ClientException("User can not subscribe to this document");
 
 			}
 
-        	
-			
 			DocumentModel prefDoc = getPreferences(notifSession, workspaceId, personUid);
 			String[] paths = (String[]) prefDoc.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
 			
@@ -332,6 +281,42 @@ public class UserPreferencesServiceImpl implements UserPreferencesService {
 		notifDoc.setPropertyValue("ntf:docs", (Serializable) complexValuesList);
 
 		return notifSession.createDocument(notifDoc);
+
+	}
+
+	@Override
+	public List<String> getUserSubscriptionPaths(CoreSession coreSession) {
+
+		CoreSession notifSession = CoreInstance.openCoreSession(notifRepository);
+
+		NuxeoPrincipal principal = (NuxeoPrincipal) notifSession.getPrincipal();
+		Serializable personUid = principal.getModel().getPropertyValue("pseudonymizedId");
+
+		List<String> pathsArray = new ArrayList<>();
+		if(personUid != null) {
+			DocumentModelList userNotifs = notifSession.query("SELECT * FROM Document WHERE ecm:primaryType = 'PreferencesNotification' AND "+UserPreferencesService.TTCPN_USERID+" = '"+
+					personUid+"' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0");
+
+			for(DocumentModel userNotif : userNotifs) {
+				String[] paths = (String[]) userNotif.getPropertyValue(UserPreferencesService.TTCPN_PATHS);
+				pathsArray.addAll(Arrays.asList(paths));
+
+			}
+		}
+		return pathsArray;
+	}
+
+	@Override
+	public void spaceNotificationsUnsubscribe(CoreSession session, DocumentModel workspace) {
+
+		CoreSession notifSession = CoreInstance.openCoreSession(notifRepository);
+
+		NuxeoPrincipal principal = (NuxeoPrincipal) notifSession.getPrincipal();
+		Serializable pseudonymizedId = principal.getModel().getPropertyValue("pseudonymizedId");
+		String workspaceId = workspace.getProperty("webc:url").getValue(String.class);
+
+		DocumentModel preferences = getPreferences(notifSession, workspaceId, pseudonymizedId.toString());
+		notifSession.removeDocument(new PathRef(preferences.getPathAsString()));
 
 	}
 

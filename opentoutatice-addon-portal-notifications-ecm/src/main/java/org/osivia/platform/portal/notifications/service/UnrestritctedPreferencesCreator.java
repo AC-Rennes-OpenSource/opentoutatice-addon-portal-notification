@@ -12,6 +12,7 @@ import org.nuxeo.ecm.core.api.security.ACL;
 import org.nuxeo.ecm.core.api.security.ACP;
 import org.nuxeo.ecm.core.api.security.impl.ACLImpl;
 import org.nuxeo.runtime.api.Framework;
+import org.osivia.platform.portal.notifications.batch.NotificationFrequency;
 
 /**
  * 
@@ -80,6 +81,7 @@ public class UnrestritctedPreferencesCreator extends UnrestrictedSessionRunner {
     		pref = session.createDocumentModel(userPref.getPathAsString(), workspaceId, "PreferencesNotification");
     		pref.setPropertyValue(UserPreferencesService.TTCPN_USERID, username);
     		pref.setPropertyValue(UserPreferencesService.TTCPN_SPACEID, workspaceId);
+			pref.setPropertyValue(UserPreferencesService.TTCPN_FREQ, NotificationFrequency.DAILY.toString());
     		pref.setPropertyValue("dc:title", workspaceId);
     		pref = session.createDocument(pref);
     		

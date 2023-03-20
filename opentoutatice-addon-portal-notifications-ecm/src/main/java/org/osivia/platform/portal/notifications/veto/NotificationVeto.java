@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,11 +50,32 @@ public class NotificationVeto implements NotificationListenerVeto {
     public final static String[] authorizedSystemEvents = {TaskEventNames.WORKFLOW_CANCELED, TaskEventNames.WORKFLOW_ABANDONED,
             TaskEventNames.WORKFLOW_TASK_ASSIGNED, TaskEventNames.WORKFLOW_TASK_COMPLETED, TaskEventNames.WORKFLOW_TASK_REJECTED};
 
+
+	private String workspacepath;
+
+	/**
+	 * Switch in the new scheduled mode with the perferences service.
+	 */
+	private Boolean scheduledNotifications;
+
+	public NotificationVeto() {
+		workspacepath = Framework.getProperty("ottc.collab.workspacepath");
+
+		// Switch in the new scheduled mode with the perferences service.
+		String scheduled = Framework.getProperty("ottc.notifications.scheduled");
+		scheduledNotifications = BooleanUtils.toBoolean(scheduled);
+	}
+
     @Override
     public boolean accept(Event event) throws Exception {
         if (event.getContext() instanceof DocumentEventContext) {
             String eventName = event.getName();
             DocumentEventContext docCtx = (DocumentEventContext) event.getContext();
+
+			// Bloquer les notifications pour lesquelles le nouveau système périodique est mis en place.
+			if(scheduledNotifications && docCtx.getSourceDocument().getPathAsString().startsWith(workspacepath)) {
+				return false;
+			}
 
             NuxeoPrincipal originatingPrincipal = (NuxeoPrincipal) docCtx.getPrincipal();
             return !blockSystemEvents(eventName, originatingPrincipal);

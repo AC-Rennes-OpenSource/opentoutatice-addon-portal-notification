@@ -43,7 +43,7 @@ public class NotificationWork extends AbstractWork {
 
 	private static final Log log = LogFactory.getLog("fr.toutatice.notifications");
 	
-	private static final String DOCS_MODIFIED = "SELECT * FROM Document WHERE dc:modified > TIMESTAMP '%s' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0 AND dc:lastContributor != '%s' AND ";
+	private static final String DOCS_MODIFIED = "SELECT * FROM Document WHERE dc:modified > TIMESTAMP '%s' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0 AND dc:lastContributor != '%s' AND ecm:mixinType != 'Folderish' AND ";
 	
 	private static final String FETCH_WORKSPACE = "SELECT * FROM Document WHERE webc:url = '%s' AND ecm:currentLifeCycleState != 'deleted' AND ecm:isVersion = 0";
 

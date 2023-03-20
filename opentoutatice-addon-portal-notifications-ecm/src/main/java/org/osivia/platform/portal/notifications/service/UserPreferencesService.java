@@ -5,6 +5,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.osivia.platform.portal.notifications.batch.NotificationBean;
 import org.osivia.platform.portal.notifications.service.DocumentNotificationInfosProviderImpl.SubscriptionStatus;
 
+import java.util.List;
+
 /**
  * 
  * @author Loïc Billon
@@ -66,4 +68,17 @@ public interface UserPreferencesService {
 	 */
 	DocumentModel createNotification(NotificationBean notif);
 
+	/**
+	 * Get all user subscriptions
+	 *
+	 * @param coreSession
+	 */
+	List<String> getUserSubscriptionPaths(CoreSession coreSession);
+
+	/**
+	 * Unsubscribe to notifications on a space
+	 * @param session
+	 * @param space
+	 */
+	void spaceNotificationsUnsubscribe(CoreSession session, DocumentModel space);
 }
