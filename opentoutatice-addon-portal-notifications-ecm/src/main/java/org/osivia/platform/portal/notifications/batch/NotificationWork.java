@@ -116,6 +116,8 @@ public class NotificationWork extends AbstractWork {
 				
 				sbNxql.append("ecm:path STARTSWITH '");
 				sbNxql.append(paths[i]);
+				sbNxql.append("' OR ecm:path = '");
+				sbNxql.append(paths[i]);
 				sbNxql.append("'");
 				
 			}
@@ -304,8 +306,9 @@ public class NotificationWork extends AbstractWork {
 			}
 			
 			// ==== Titre
+			sb.append("\"");
 			sb.append(currentDoc.getTitle());
-			sb.append(" ");
+			sb.append("\" ");
 			
 			// ==== Date de modificaiton
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM - HH:mm");
@@ -321,7 +324,7 @@ public class NotificationWork extends AbstractWork {
 			
 			// ===== Permalien
 			sb.append("<a href=\"");
-			sb.append(Framework.getProperty("portal.permalink"));
+			sb.append(Framework.getProperty("nuxeo.permalink.service.portal.url"));
 			sb.append("/");
 			sb.append(Framework.getProperty("nuxeo.permalink.service.param1"));
 			sb.append("/share/");

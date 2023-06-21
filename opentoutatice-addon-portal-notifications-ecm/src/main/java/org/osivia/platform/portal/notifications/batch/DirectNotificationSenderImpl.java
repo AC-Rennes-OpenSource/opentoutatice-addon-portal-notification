@@ -227,25 +227,7 @@ public class DirectNotificationSenderImpl implements DirectNotificationSender  {
         
         messageBodyPart.setContent(bodyMail, "text/html; charset=utf-8");
         multipart.addBodyPart(messageBodyPart);
-        
 
-		String logoPath = Framework.getProperty(PROP_LOGO_PATH);
-		if (StringUtils.isNotBlank(logoPath)) {
-			File f = new File(logoPath);
-			if (!f.exists() || !f.canRead()) {
-				log.warn("Chemin de logo "+logoPath+" incorrect.");
-			}
-			else {
-				BodyPart attechedImages = new MimeBodyPart();
-				DataSource source = new FileDataSource(f);
-				attechedImages.setDataHandler(new DataHandler(source));
-				attechedImages.setHeader("Content-ID", "<logo>");
-                attechedImages.setDisposition(MimeBodyPart.INLINE);
-				multipart.addBodyPart(attechedImages);
-			}
-
-		}
-        
         // Send the message.
         msg.setContent(multipart);
         Transport.send(msg);
